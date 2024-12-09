@@ -19,4 +19,8 @@ impl<'d> I2cHandler<'d>  {
 
        Result::Ok(Self { i2c })
     }
+
+    pub fn get_inner_i2c(self) -> I2c<'d, Blocking, AnyI2c> {
+        self.i2c
+    } 
 }
