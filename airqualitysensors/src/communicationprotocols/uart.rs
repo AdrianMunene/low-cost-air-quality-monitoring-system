@@ -1,5 +1,5 @@
 use esp_hal::{
-    peripheral::Peripheral, uart::{AnyUart, Config, Error, Uart}, Blocking, 
+    peripheral::Peripheral, uart::{AnyUart, Config, Error, Uart, Instance}, Blocking 
 };
 use esp_hal::gpio::interconnect::{PeripheralInput, PeripheralOutput};
 use core::result::Result;
@@ -10,15 +10,14 @@ pub struct UartHandler<'d> {
 
 impl<'d> UartHandler<'d> {
     pub fn new(
+        uart: impl Peripheral<P = impl Instance> + 'd,
         rx: impl Peripheral<P = impl PeripheralInput> + 'd, 
         tx: impl Peripheral<P = impl PeripheralOutput> + 'd, 
         baudrate: u32,) -> Result<Self, Error> {
 
-            let peripherals = esp_hal::init(esp_hal::Config::default());
-
             let config = Config::default().baudrate(baudrate);
 
-            let uart = Uart::new_with_config(peripherals.UART1, config, rx, tx)?;
+            let uart = Uart::new_with_config(uart, config, rx, tx)?;
 
             Result::Ok(Self { uart })
 
