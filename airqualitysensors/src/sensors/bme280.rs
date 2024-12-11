@@ -17,7 +17,7 @@ impl<'d> Bme280<'d> {
 
         let i2c = I2cHandler::new(i2c, sda, scl).unwrap();
 
-        let mut bme280 = BME280::new_primary(i2c.get_inner_i2c()); 
+        let bme280 = BME280::new_primary(i2c.get_inner_i2c()); 
 
         Result::Ok(Self { bme280 })
 

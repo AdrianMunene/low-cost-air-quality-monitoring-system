@@ -16,7 +16,7 @@ impl<'d> Pms5003<'d> {
     pub fn read_pm(&mut self) -> Result<(u16, u16, u16), &'static str> {
         let mut buffer = [0u8; 32];
 
-        self.uart_handler.read(&mut buffer).map_err(|_| "Failed to read data from PMS5003");
+        self.uart_handler.read(&mut buffer).map_err(|_| "Failed to read data from PMS5003")?;
 
         if buffer[0] == 0x42 && buffer[1] == 0x4D {
             let pm1_0 = ((buffer[10] as u16) << 8) | (buffer[11] as u16);
