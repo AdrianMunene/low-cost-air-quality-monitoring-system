@@ -1,9 +1,5 @@
-use crate::communicationprotocols::uart::UartHandler;
-use esp_hal::{
-    gpio::interconnect::{PeripheralInput, PeripheralOutput}, 
-    peripheral::Peripheral, 
-    uart::{Instance, Error}
-};
+use crate::communicationprotocols::uart::{ UartHandler, SharedUart };
+
 use core::result::Result;
 
 pub struct Pms5003<'d> {
@@ -11,15 +7,10 @@ pub struct Pms5003<'d> {
 }
 
 impl<'d> Pms5003<'d> {
-    pub fn new(
-        uart: impl Peripheral<P = impl Instance> + 'd,
-        rx: impl Peripheral<P = impl PeripheralInput> + 'd, 
-        tx: impl Peripheral<P = impl PeripheralOutput> + 'd, 
-        baudrate: u32) -> Result<Self, Error> {
+    pub fn new(shared_uart: &'d SharedUart<'d>)  -> Self {
+        let uart_handler = UartHandler::new(shared_uart);
 
-            let uart_handler = UartHandler::new(uart, rx, tx, baudrate)?;
-
-            Result::Ok(Self { uart_handler })
+        Self { uart_handler }
     }
 
     pub fn read_pm(&mut self) -> Result<(u16, u16, u16), &'static str> {

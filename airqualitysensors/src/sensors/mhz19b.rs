@@ -1,25 +1,17 @@
-use crate::communicationprotocols::uart::UartHandler;
-use esp_hal::{
-    gpio::interconnect::{PeripheralInput, PeripheralOutput}, 
-    peripheral::Peripheral, 
-    uart::{Instance, Error}
-};
+use crate::communicationprotocols::uart::{ UartHandler, SharedUart };
+    
 use core::result::Result;
+
 pub struct Mhz19b<'d> {
     uart_handler: UartHandler<'d>,
 }
 
 impl<'d> Mhz19b<'d> {
-    pub fn new(
-        uart: impl Peripheral<P = impl Instance> +'d,
-        rx: impl Peripheral<P = impl PeripheralInput> + 'd, 
-        tx: impl Peripheral<P = impl PeripheralOutput> + 'd, 
-        baudrate: u32) -> Result<Self, Error> {
+    pub fn new(shared_uart: &'d SharedUart<'d>) -> Self {
+        let uart_handler = UartHandler::new(shared_uart);
 
-            let uart_handler = UartHandler::new(uart, rx, tx, baudrate)?;
-
-            Result::Ok(Self { uart_handler })
-    } 
+        Self { uart_handler }
+    }
 
     pub fn read_co2(&mut self) -> Result<u16, &'static str> {
         let read_command = [0xFF, 0x01, 0x86, 0x00, 0x00, 0x00, 0x00, 0x00, 0x79];

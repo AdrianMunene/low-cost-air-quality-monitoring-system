@@ -1,34 +1,43 @@
 use esp_hal::{
-    peripheral::Peripheral, uart::{AnyUart, Config, Error, Uart, Instance}, Blocking 
+    uart::{AnyUart, Uart}, Blocking 
 };
-use esp_hal::gpio::interconnect::{PeripheralInput, PeripheralOutput};
 use core::result::Result;
-use core::default::Default;
+use core::cell::RefCell;
+
+use critical_section::Mutex;
+
+pub type SharedUart<'d> = Mutex<RefCell<Option<Uart<'d, Blocking, AnyUart>>>>;
+
 pub struct UartHandler<'d> {
-    uart: Uart<'d, Blocking, AnyUart>,
+    shared_uart: &'d SharedUart<'d>,
 }
 
 impl<'d> UartHandler<'d> {
-    pub fn new(
-        uart: impl Peripheral<P = impl Instance> + 'd,
-        rx: impl Peripheral<P = impl PeripheralInput> + 'd, 
-        tx: impl Peripheral<P = impl PeripheralOutput> + 'd, 
-        baudrate: u32,) -> Result<Self, Error> {
-
-            let config = Config::default().baudrate(baudrate);
-
-            let uart = Uart::new_with_config(uart, config, rx, tx)?;
-
-            Result::Ok(Self { uart })
-
+    pub fn new(shared_uart: &'d SharedUart<'d>) -> Self {
+        Self { shared_uart }
     }
 
-    pub fn write(&mut self, data: &[u8],) -> Result<usize, Error> {
-        self.uart.write_bytes(data)
+    pub fn write(&self, data: &[u8],) -> Result<usize, &'static str> {
+        critical_section::with(|cs| {
+            let mut uart = self.shared_uart.borrow_ref_mut(cs);
+            if let Some(uart) = uart.as_mut() {
+                uart.write_bytes(data).map_err(|_| "Write failed")
+            } else {
+                Err("Uart not initialised")
+            }
+        })
     }
 
-    pub fn read(&mut self, buffer: &mut [u8],) -> Result<(), Error> {
-        self.uart.read_bytes(buffer)
+    pub fn read(&self, buffer: &mut [u8],) -> Result<(), &'static str> {
+        critical_section::with(|cs| {
+            let mut uart = self.shared_uart.borrow_ref_mut(cs);
+            if let Some(uart) = uart.as_mut() {
+                uart.read_bytes(buffer).map_err(|_| "Read failed")
+            } else {
+                Err("Uart not initialised")
+            }
+        })
     }
 }
+
 
