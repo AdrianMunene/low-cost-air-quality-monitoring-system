@@ -10,7 +10,13 @@ impl<'d> Mhz19b<'d> {
     pub fn new(shared_uart: &'d SharedUart<'d>) -> Self {
         let uart_handler = UartHandler::new(shared_uart);
 
-        Self { uart_handler }
+        let sensor = Self { uart_handler };
+
+        let stop_auto_send_command = [0xFF, 0x01, 0x79, 0x00, 0x00, 0x00, 0x00, 0x00, 0x86];
+
+        sensor.uart_handler.write(&stop_auto_send_command).expect("Failed to disable auto-send on MH-Z19B");
+
+        sensor
     }
 
     pub fn read_co2(&mut self) -> Result<u16, &'static str> {

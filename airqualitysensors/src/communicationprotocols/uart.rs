@@ -1,12 +1,12 @@
 use esp_hal::{
-    uart::{AnyUart, Uart}, Blocking 
+    uart::{AnyUart, Uart}, Async, 
 };
 use core::result::Result;
 use core::cell::RefCell;
 
 use critical_section::Mutex;
 
-pub type SharedUart<'d> = Mutex<RefCell<Option<Uart<'d, Blocking, AnyUart>>>>;
+pub type SharedUart<'d> = Mutex<RefCell<Option<Uart<'d, Async, AnyUart>>>>;
 
 pub struct UartHandler<'d> {
     shared_uart: &'d SharedUart<'d>,
