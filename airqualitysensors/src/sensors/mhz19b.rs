@@ -1,8 +1,9 @@
-use crate::communicationprotocols::uart::UartHandler;
+use crate::communicationprotocols::{ uart::UartHandler, lp_uart::LpUartHandler };
 
 use esp_hal::{
     gpio::interconnect::{ PeripheralOutput, PeripheralInput },
     peripheral::Peripheral,
+    peripherals::LP_UART,
     uart::{ Instance, Error }
 };
 
@@ -40,5 +41,18 @@ impl<'d> Mhz19b<'d> {
         } else {
             Result::Err("Invalid data from MHZ19B")
         }
+    }
+}
+
+pub struct LpMhz19b {
+    #[allow(unused)]
+    lp_uart_handler: LpUartHandler, 
+}
+
+impl LpMhz19b {
+    pub fn new(uart: LP_UART, baudrate: u32) -> Result<Self, Error> {
+        let lp_uart_handler = LpUartHandler::new(uart, baudrate).unwrap();
+
+        Result::Ok(Self { lp_uart_handler })
     }
 }

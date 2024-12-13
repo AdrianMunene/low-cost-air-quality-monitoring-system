@@ -1,9 +1,7 @@
-use crate::communicationprotocols::uart::UartHandler;
+use crate::communicationprotocols::{ uart::UartHandler, lp_uart::LpUartHandler };
 
 use esp_hal::{
-    gpio::interconnect::{ PeripheralOutput, PeripheralInput },
-    peripheral::Peripheral,
-    uart::{ Instance, Error }
+    gpio::interconnect::{ PeripheralInput, PeripheralOutput }, peripheral::Peripheral, peripherals::LP_UART, uart::{ Error, Instance }
 };
 
 use core::result::Result;
@@ -39,5 +37,18 @@ impl<'d> Pms5003<'d> {
             Result::Err("Invalid header bytes from PMS5003 data")
         }
 
+    }
+}
+
+pub struct LpPms5003 {
+    #[allow(unused)]
+    lp_uart_handler: LpUartHandler, 
+}
+
+impl LpPms5003 {
+    pub fn new(uart: LP_UART, baudrate: u32) -> Result<Self, Error> {
+        let lp_uart_handler = LpUartHandler::new(uart, baudrate).unwrap();
+
+        Result::Ok(Self { lp_uart_handler })
     }
 }

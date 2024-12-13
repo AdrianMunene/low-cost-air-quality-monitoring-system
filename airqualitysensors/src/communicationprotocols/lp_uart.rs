@@ -6,7 +6,8 @@ use esp_hal::{
 use core::result::Result;
 
 pub struct LpUartHandler {
-    lpuart: LpUart
+    #[allow(unused)]
+    lp_uart: LpUart
 }
 
 impl  LpUartHandler {
@@ -14,9 +15,9 @@ impl  LpUartHandler {
 
         let config = Config::default().baudrate(baudrate);
 
-        let lpuart = LpUart::new_with_config(uart, config);
+        let lp_uart = LpUart::new_with_config(uart, config);
 
-        Result::Ok(Self { lpuart })
+        Result::Ok(Self { lp_uart })
 
     }
 }
