@@ -1,4 +1,10 @@
-use crate::communicationprotocols::uart::{ UartHandler, SharedUart };
+use crate::communicationprotocols::uart::UartHandler;
+
+use esp_hal::{
+    gpio::interconnect::{ PeripheralOutput, PeripheralInput },
+    peripheral::Peripheral,
+    uart::{ Instance, Error }
+};
 
 use core::result::Result;
 
@@ -7,16 +13,15 @@ pub struct Pms5003<'d> {
 }
 
 impl<'d> Pms5003<'d> {
-    pub fn new(shared_uart: &'d SharedUart<'d>)  -> Self {
-        let uart_handler = UartHandler::new(shared_uart);
+    pub fn new(
+        uart:impl Peripheral<P = impl Instance> + 'd,
+        rx:impl Peripheral<P = impl PeripheralInput> + 'd,
+        tx: impl Peripheral<P = impl PeripheralOutput> + 'd,
+        baudrate: u32,
+    )  -> Result<Self, Error> {
+        let uart_handler = UartHandler::new(uart, rx, tx, baudrate).unwrap();
 
-        let sensor = Self { uart_handler };
-
-        let passive_mode_command = [0x42, 0x4D, 0xE1, 0x00, 0x00, 0x01, 0x70];
-
-        sensor.uart_handler.write(&passive_mode_command).expect("Failed to set PMS5003 to passive mode");
-
-        sensor
+        Result::Ok(Self { uart_handler })
     }
 
     pub fn read_pm(&mut self) -> Result<(u16, u16, u16), &'static str> {
