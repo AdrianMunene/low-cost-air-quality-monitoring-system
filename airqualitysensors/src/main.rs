@@ -6,7 +6,7 @@ use airqualitysensors::sensors::mhz19b::Mhz19b;
 use airqualitysensors::sensors::bme280::Bme280;
 
 use esp_backtrace as _;
-use esp_hal::{ uart::{ Uart, Config }, delay::Delay, prelude::* };
+use esp_hal::{ delay::Delay, prelude::* };
 use esp_println::println;
 
 
@@ -15,7 +15,9 @@ fn main() -> ! {
     #[allow(unused)]
     let peripherals = esp_hal::init(esp_hal::Config::default());
     let mut delay = Delay::new();
-    let config = Config::default().baudrate(9600);
+
+    let mut pms5003 = Pms5003::new(peripherals.UART1, peripherals.GPIO20, peripherals.GPIO21, 9600).unwrap();
+    let mut mhz19b = Mhz19b::new(peripherals.UART0, peripherals.GPIO17, peripherals.GPIO16, 9600).unwrap();
 
 
     let mut bme280 = Bme280::new(peripherals.I2C0, peripherals.GPIO6, peripherals.GPIO7).unwrap();

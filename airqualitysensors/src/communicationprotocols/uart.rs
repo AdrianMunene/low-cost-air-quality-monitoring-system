@@ -4,11 +4,6 @@ use esp_hal::{
     uart::{AnyUart, Instance, Uart, Config, Error}, Async 
 };
 use core::result::Result;
-use core::cell::RefCell;
-
-//use critical_section::Mutex;
-
-//pub type SharedUart<'d> = Mutex<RefCell<Option<Uart<'d, Async, AnyUart>>>>;
 
 pub struct UartHandler<'d> {
    uart: Uart<'d, Async, AnyUart>,
