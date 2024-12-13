@@ -36,6 +36,10 @@ fn main() -> ! {
     bme280.init(&mut delay);
 
     loop {
+        //BME280
+        if let Ok(measurements) = bme280.measure(&mut delay) {
+            println!("BME280: Temperature: {}°C, Humidity: {}%, Pressure{}pa", measurements.temperature, measurements.humidity, measurements.pressure);
+        }
 
         //PMS5003
         if let Ok((pm1_0, pm2_5, pm10)) = pms5003.read_pm() {
@@ -47,11 +51,6 @@ fn main() -> ! {
             println!("MHZ19B: CO2: {} ppm", co2);
         }
 
-        //BME280
-        if let Ok(measurements) = bme280.measure(&mut delay) {
-            println!("BME280: Temperature: {}°C, Humidity: {}%, Pressure{}pa", measurements.temperature, measurements.humidity, measurements.pressure);
-        }
-
-        delay.delay(500.millis());
+        delay.delay(1000.millis());
     }
 }
