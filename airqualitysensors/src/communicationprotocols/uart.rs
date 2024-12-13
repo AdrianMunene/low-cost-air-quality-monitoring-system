@@ -1,12 +1,12 @@
 use esp_hal::{
     gpio::interconnect::{ PeripheralInput, PeripheralOutput}, 
     peripheral::Peripheral, 
-    uart::{AnyUart, Instance, Uart, Config, Error}, Async 
+    uart::{AnyUart, Instance, Uart, Config, Error}, Blocking 
 };
 use core::result::Result;
 
 pub struct UartHandler<'d> {
-   uart: Uart<'d, Async, AnyUart>,
+   uart: Uart<'d, Blocking, AnyUart>,
 }
 
 impl<'d> UartHandler<'d> {
@@ -18,7 +18,7 @@ impl<'d> UartHandler<'d> {
 
             let config = Config::default().baudrate(baudrate);
 
-            let uart = Uart::new_with_config(uart, config, rx, tx).unwrap().into_async();
+            let uart = Uart::new_with_config(uart, config, rx, tx).unwrap();
 
             Result::Ok(Self { uart })
         }
