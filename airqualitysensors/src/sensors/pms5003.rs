@@ -25,10 +25,8 @@ impl<'d> Pms5003<'d> {
     }
 
     pub fn read_pm(&mut self) -> Result<(u16, u16, u16), &'static str> {
-        let query_command = [0x42, 0x4D, 0xE2, 0x00, 0x00, 0x01, 0x71];
         let mut buffer = [0u8; 32];
 
-        self.uart_handler.write(&query_command).map_err(|_| "Failed to send query command to PMS5003")?;
         self.uart_handler.read(&mut buffer).map_err(|_| "Failed to read data from PMS5003")?;
 
         if buffer[0] == 0x42 && buffer[1] == 0x4D {
