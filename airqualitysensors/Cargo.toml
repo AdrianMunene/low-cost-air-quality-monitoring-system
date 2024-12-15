@@ -5,6 +5,20 @@ authors = ["AdrianMunene <adrianmunene62@gmail.com>"]
 edition = "2021"
 license = "MIT OR Apache-2.0"
 
+[[bin]]
+name = "airqualitysensors"
+path = "src/main.rs"
+test = false
+doctest = false
+bench = false
+
+[lib]
+name = "airqualitysensors"
+path = "src/lib.rs"
+test = false
+doctest = false
+bench = false
+
 [dependencies]
 esp-backtrace = { version = "0.14.2", features = [
     "esp32c6",
