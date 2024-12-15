@@ -1,9 +1,14 @@
 use esp_hal::{
-    i2c::master::{AnyI2c, Config, I2c, Instance, Error}, peripheral::Peripheral, Blocking
+    gpio::interconnect::PeripheralOutput,
+    i2c::master::{AnyI2c, Config, I2c, Instance, Error}, 
+    peripheral::Peripheral, 
+    Blocking,
 };
-use esp_hal::gpio::interconnect::PeripheralOutput;
-use core::result::Result;
-use core::default::Default;
+
+use core::{ 
+    result::Result, 
+    default::Default, 
+};
 
 pub struct I2cHandler<'d> {
     i2c:I2c<'d, Blocking, AnyI2c>,

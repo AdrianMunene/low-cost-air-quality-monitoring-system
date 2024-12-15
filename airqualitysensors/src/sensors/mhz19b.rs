@@ -2,9 +2,9 @@ use crate::communicationprotocols::{ uart::UartHandler, lp_uart::LpUartHandler }
 
 use esp_hal::{
     gpio::interconnect::{ PeripheralOutput, PeripheralInput },
+    uart::{ Instance, Error },
     peripheral::Peripheral,
     peripherals::LP_UART,
-    uart::{ Instance, Error }
 };
 
 use core::result::Result;

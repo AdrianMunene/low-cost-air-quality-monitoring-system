@@ -1,8 +1,10 @@
 use esp_hal::{
     gpio::interconnect::{ PeripheralInput, PeripheralOutput}, 
     peripheral::Peripheral, 
-    uart::{AnyUart, Instance, Uart, Config, Error}, Blocking 
+    uart::{AnyUart, Instance, Uart, Config, Error}, 
+    Blocking,
 };
+
 use core::result::Result;
 
 pub struct UartHandler<'d> {

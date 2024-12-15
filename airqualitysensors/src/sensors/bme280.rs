@@ -1,10 +1,16 @@
 use crate::communicationprotocols::i2c::I2cHandler;
-use esp_hal::{
-    i2c::master::{I2c, AnyI2c, Error, Instance}, peripheral::Peripheral, Blocking, delay::Delay
-};
-use esp_hal::gpio::interconnect::PeripheralOutput;
-use core::result::Result;
+
 use bme280::i2c::BME280;
+
+use esp_hal::{
+    gpio::interconnect::PeripheralOutput,
+    i2c::master::{I2c, AnyI2c, Error, Instance}, 
+    peripheral::Peripheral, 
+    delay::Delay,
+    Blocking, 
+};
+
+use core::result::Result;
 
 pub struct Bme280<'d> {
     bme280: BME280<I2c<'d, Blocking, AnyI2c>>

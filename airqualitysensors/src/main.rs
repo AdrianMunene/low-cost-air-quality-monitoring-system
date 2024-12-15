@@ -5,8 +5,12 @@ use airqualitysensors::sensors::pms5003::Pms5003;
 use airqualitysensors::sensors::mhz19b::Mhz19b;
 use airqualitysensors::sensors::bme280::Bme280;
 
+use esp_hal::{ 
+    delay::Delay, 
+    prelude::*, 
+};
+
 use esp_backtrace as _;
-use esp_hal::{ delay::Delay, prelude::* };
 use esp_println::println;
 
 
