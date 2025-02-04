@@ -2,11 +2,16 @@
 #![no_main]
 
 use esp_backtrace as _;
-use esp_hal::delay::Delay;
-use esp_hal::prelude::*;
+
+use esp_hal::{ 
+    clock::CpuClock,
+    delay::Delay,
+    main,
+};
+
 use log::info;
 
-#[entry]
+#[main]
 fn main() -> ! {
     let _peripherals = esp_hal::init({
         let mut config = esp_hal::Config::default();
@@ -19,7 +24,7 @@ fn main() -> ! {
     let delay = Delay::new();
     loop {
         info!("Hello world!");
-        delay.delay(500.millis());
+        delay.delay_millis(500);
     }
 
     // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/v0.22.0/examples/src/bin
