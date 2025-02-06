@@ -3,6 +3,21 @@ name = "sim808"
 version = "0.1.0"
 edition = "2021"
 
+[[bin]]
+name = "sim808"
+path = "src/bin/main.rs"
+test = false
+doctest = false
+bench = false
+
+[lib]
+name = "sim808"
+path = "src/lib.rs"
+test = false
+doctest = false
+bench = false
+
+
 [dependencies]
 esp-backtrace = { version = "0.14.2", features = [
     "esp32c6",
