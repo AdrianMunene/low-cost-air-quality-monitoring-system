@@ -10,6 +10,7 @@ dependencies = [
  "critical-section",
  "embassy-executor",
  "embassy-net",
+ "embassy-sync",
  "embassy-time",
  "embedded-io",
  "embedded-io-async",

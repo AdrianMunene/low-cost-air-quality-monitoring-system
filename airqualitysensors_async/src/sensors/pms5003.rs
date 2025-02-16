@@ -27,6 +27,7 @@ impl <'d> Pms5003<'d> {
     pub async fn read_pm(&mut self) -> Result<(u16, u16, u16), &'static str> {
         let mut buffer = [0u8; 32];
 
+        self.uart_handler.flush().await;
         self.uart_handler.read(&mut buffer).await.map_err(|_| "Failed to read data from PMS5003")?;
 
         if buffer[0] == 0x42 && buffer[1] == 0x4D {
@@ -38,7 +39,6 @@ impl <'d> Pms5003<'d> {
         } else {
             Result::Err("Invalid header bytes from PMS5003 data")
         }
-
     }
  
 }

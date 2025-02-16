@@ -33,5 +33,9 @@ impl<'d> UartHandler<'d> {
     pub async fn read(&mut self, buffer: &mut [u8],) -> Result<usize, Error> {
         self.uart.read_async(buffer).await
     }
+
+    pub async fn flush(&mut self) {
+        self.uart.flush_async().await.unwrap();
+    }
 }
 

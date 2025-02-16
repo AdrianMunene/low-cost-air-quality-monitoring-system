@@ -3,22 +3,43 @@
 
 use airqualitysensors_async::sensors::{
     bme280::Bme280, 
-    mhz19b::Mhz19b, 
+    mhz19b::Mhz19b,
     pms5003::Pms5003,
 };
 
 use esp_hal::{
     clock::CpuClock,
-    delay::Delay,
+    delay::Delay
 };
+
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 
 use esp_backtrace as _;
 
+use esp_wifi::{
+    EspWifiController,
+    esp_now::{EspNowReceiver, EspNowSender, PeerInfo, }
+};
+
 use log::info;
 
 extern crate alloc;
+use alloc::{
+    format,
+    str::from_utf8,
+};
+
+use core::mem::MaybeUninit;
+
+use embassy_sync::{
+    blocking_mutex::raw::CriticalSectionRawMutex,
+    signal::Signal,
+};
+
+static DATA_REQUEST_SIGNAL: Signal<CriticalSectionRawMutex, ()> = Signal::new();
+static mut INIT: MaybeUninit<EspWifiController<'static>> = MaybeUninit::uninit();
+
 
 #[esp_hal_embassy::main]
 async fn main(spawner: Spawner) {
@@ -26,6 +47,7 @@ async fn main(spawner: Spawner) {
 
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let peripherals = esp_hal::init(config);
+    let mut delay = Delay::new();
 
     esp_alloc::heap_allocator!(72 * 1024);
 
@@ -37,62 +59,89 @@ async fn main(spawner: Spawner) {
     info!("Embassy initialized!");
 
     let timer1 = esp_hal::timer::timg::TimerGroup::new(peripherals.TIMG0);
-    let _init = esp_wifi::init(timer1.timer0, esp_hal::rng::Rng::new(peripherals.RNG), peripherals.RADIO_CLK,).unwrap();
+
+    #[allow(unused_unsafe)]
+    let init = unsafe{ 
+        INIT.write(esp_wifi::init(timer1.timer0, esp_hal::rng::Rng::new(peripherals.RNG), peripherals.RADIO_CLK,).unwrap()); 
+        
+        INIT.assume_init_mut()
+    };
+
+
+    let esp_now = esp_wifi::esp_now::EspNow::new(init, peripherals.WIFI).unwrap(); 
+    let (manager, sender, receiver) = esp_now.split();
+
+    let peer_address = [0x40,0x4c,0xca,0x4c,0x44,0xd8];
+
+    manager.add_peer(PeerInfo{peer_address, lmk: None, channel: None, encrypt: false}).unwrap();
+
 
     let mhz19b = Mhz19b::new(peripherals.UART0, peripherals.GPIO17, peripherals.GPIO16, 9600).unwrap();
     let pms5003 = Pms5003::new(peripherals.UART1, peripherals.GPIO20, peripherals.GPIO21, 9600).unwrap(); 
-    let bme280 = Bme280::new(peripherals.I2C0, peripherals.GPIO6, peripherals.GPIO7).unwrap();
+    let mut bme280 = Bme280::new(peripherals.I2C0, peripherals.GPIO6, peripherals.GPIO7).unwrap();
+    bme280.init(&mut delay);
 
-    spawner.spawn(read_pms5003(pms5003)).unwrap();
-    spawner.spawn(read_mhz19b(mhz19b)).unwrap();
-    spawner.spawn(read_bme280(bme280)).unwrap();
-
-
-    // TODO: Spawn some tasks
-    let _ = spawner;
+    spawner.spawn(listen_for_signal(receiver)).unwrap();
+    spawner.spawn(send_data(sender, peer_address, pms5003, mhz19b, bme280)).unwrap();
 
     loop {
-        info!("Hello world!");
         Timer::after(Duration::from_secs(1)).await;
     }
 }
 
 #[embassy_executor::task]
-async fn read_pms5003(mut pms5003: Pms5003<'static>) {
-    loop {
-        info!("Reading PMS5003...");
+async fn listen_for_signal(mut receiver: EspNowReceiver<'static>) {
+    let message = receiver.receive_async().await;
+    let received_data = from_utf8(message.data()).unwrap_or(""); 
 
-        if let Ok((pm1_0, pm2_5, pm10)) = pms5003.read_pm().await {
-            info!("PMS5003 - PM1.0: {}μg/m3, PM2.5: {}μg/m3, PM10: {}μg/m3", pm1_0, pm2_5, pm10);
-        } else {
-            info!("Failed to read PMS5003");
-        }
+    if received_data == "REQUEST DATA" {
+        info!("Received signal from SIM808 node");
+        DATA_REQUEST_SIGNAL.signal(());
     }
 }
 
 #[embassy_executor::task]
-async fn read_mhz19b(mut mhz19b: Mhz19b<'static>) {
+async fn send_data(
+    mut sender: EspNowSender<'static>, 
+    peer_address: [u8; 6],
+    mut pms5003: Pms5003<'static>,
+    mut mhz19b: Mhz19b<'static>,
+    mut bme280: Bme280<'static>,) {
     loop {
-        info!("Reading MH-Z19B...");
 
-        if let Ok(co2) = mhz19b.read_co2().await {
-            info!("MH-Z19B: CO2: {}, ppm", co2);
-        } else {
-            info!("Failed to read MH-Z19B");
-        }
+        DATA_REQUEST_SIGNAL.wait().await;
+
+        let(pm1_0, pm2_5, pm10) = read_pms5003(&mut pms5003).await;
+        let co2 = read_mhz19b(&mut mhz19b).await;
+        let (temperature, pressure, humidity) = read_bme280(&mut bme280).await;
+
+        let airquality_data = format!(
+            r#"{{ "co2": {}, "pm1_0": {}, "pm2_5": {}, "pm10": {}, "temperature": {}, "humidity": {}, "pressure": {} }}"#, 
+            co2, pm1_0, pm2_5, pm10, temperature, humidity, pressure
+        );
+
+        let status = sender.send_async(&peer_address, airquality_data.as_bytes()).await;
+        info!("ESP-NOW send status: {:?}", status);
     }
+} 
+
+async fn read_pms5003(pms5003: &mut Pms5003<'static>) -> (u16, u16, u16) {
+
+    pms5003.read_pm().await.unwrap_or((999, 999, 999))
+
 }
 
-#[embassy_executor::task]
-async fn read_bme280(mut bme280: Bme280<'static>) {
-    loop {
-        info!("Reading BME280");
+async fn read_mhz19b(mhz19b: &mut Mhz19b<'static>) -> u16 {
+    
+    mhz19b.read_co2().await.unwrap_or(999)
+
+}
+
+async fn read_bme280(bme280: &mut Bme280<'static>) -> (f32, f32, f32) {
+
         let mut delay = Delay::new();
 
-        if let Ok(measurements) = bme280.measure(&mut delay) {
-            info!("BME280: Temperature: {}°C, Humidity: {}%, Pressure{}pa", measurements.temperature, measurements.humidity, measurements.pressure);
-        } else {
-            info!("Failed to read BME280");
-        }
-    }
+        let measurements = bme280.measure(&mut delay).unwrap();
+        (measurements.temperature, measurements.humidity, measurements.pressure)
+
 }

@@ -32,6 +32,7 @@ impl<'d> Mhz19b<'d> {
 
         self.uart_handler.write(&read_command).await.map_err(|_| "Write failed")?;
         self.uart_handler.read(&mut buffer).await.map_err(|_| "Read failed")?;
+        self.uart_handler.flush().await;
 
         if buffer[0] == 0xFF && buffer[1] == 0x86 {
             let co2_concentration  = ((buffer[2] as u16) << 8) | (buffer[3] as u16) ;
