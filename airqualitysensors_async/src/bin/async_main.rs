@@ -60,7 +60,6 @@ async fn main(spawner: Spawner) {
 
     let timer1 = esp_hal::timer::timg::TimerGroup::new(peripherals.TIMG0);
 
-    #[allow(unused_unsafe)]
     let init = unsafe{ 
         INIT.write(esp_wifi::init(timer1.timer0, esp_hal::rng::Rng::new(peripherals.RNG), peripherals.RADIO_CLK,).unwrap()); 
         
