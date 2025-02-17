@@ -41,6 +41,7 @@ esp-wifi = { version = "0.12.0", default-features = false, features = [
   "log",
   "utils",
   "wifi",
+  "esp-now"
 ] }
 heapless = { version = "0.8.0", default-features = false }
 log = { version = "0.4.21" }
