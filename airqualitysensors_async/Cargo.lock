@@ -9,6 +9,7 @@ dependencies = [
  "bme280",
  "critical-section",
  "embassy-executor",
+ "embassy-futures",
  "embassy-net",
  "embassy-sync",
  "embassy-time",

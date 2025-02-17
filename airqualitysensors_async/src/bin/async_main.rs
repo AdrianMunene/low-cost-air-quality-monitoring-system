@@ -1,41 +1,27 @@
 #![no_std]
 #![no_main]
 
-use airqualitysensors_async::sensors::{
-    bme280::Bme280, 
-    mhz19b::Mhz19b,
-    pms5003::Pms5003,
-};
+use airqualitysensors_async::sensors::{ bme280::Bme280, mhz19b::Mhz19b, pms5003::Pms5003 };
 
-use esp_hal::{
-    clock::CpuClock,
-    delay::Delay
-};
+use esp_hal::{ clock::CpuClock, delay::Delay };
 
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
+use embassy_futures::join::join;
 
 use esp_backtrace as _;
 
-use esp_wifi::{
-    EspWifiController,
-    esp_now::{EspNowReceiver, EspNowSender, PeerInfo, }
-};
+use esp_println::println;
+use esp_wifi::{ EspWifiController, esp_now::{ EspNowReceiver, EspNowSender, PeerInfo } };
 
 use log::info;
 
 extern crate alloc;
-use alloc::{
-    format,
-    str::from_utf8,
-};
+use alloc::{ format, str::from_utf8 };
 
 use core::mem::MaybeUninit;
 
-use embassy_sync::{
-    blocking_mutex::raw::CriticalSectionRawMutex,
-    signal::Signal,
-};
+use embassy_sync::{ blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal };
 
 static DATA_REQUEST_SIGNAL: Signal<CriticalSectionRawMutex, ()> = Signal::new();
 static mut INIT: MaybeUninit<EspWifiController<'static>> = MaybeUninit::uninit();
@@ -110,17 +96,28 @@ async fn send_data(
 
         DATA_REQUEST_SIGNAL.wait().await;
 
-        let(pm1_0, pm2_5, pm10) = read_pms5003(&mut pms5003).await;
-        let co2 = read_mhz19b(&mut mhz19b).await;
-        let (temperature, pressure, humidity) = read_bme280(&mut bme280).await;
+        let ((pm_data, co2_data), bme_data) = 
+        join(
+            join(read_pms5003(&mut pms5003), read_mhz19b(&mut mhz19b)), 
+            read_bme280(&mut bme280)
+        ).await;
+
+        let(pm1_0, pm2_5, pm10) = pm_data;
+        //read_pms5003(&mut pms5003).await;
+        let co2 = co2_data;
+        //read_mhz19b(&mut mhz19b).await;
+        let (temperature, pressure, humidity) = bme_data;
+        //read_bme280(&mut bme280).await;
 
         let airquality_data = format!(
-            r#"{{ "co2": {}, "pm1_0": {}, "pm2_5": {}, "pm10": {}, "temperature": {}, "humidity": {}, "pressure": {} }}"#, 
+            r#"{{ "co2": {}, "pm1_0": {}, "pm2_5": {}, "pm10": {}, "temperature": {:.3}, "humidity": {:.3}, "pressure": {:.3} }}"#, 
             co2, pm1_0, pm2_5, pm10, temperature, humidity, pressure
         );
 
-        let status = sender.send_async(&peer_address, airquality_data.as_bytes()).await;
-        info!("ESP-NOW send status: {:?}", status);
+        match sender.send_async(&peer_address, airquality_data.as_bytes()).await {
+            Ok(_) => println!("✅ ESP-NOW data sent successfully"),
+            Err(e) => println!("❌ ESP-NOW send failed, {:?}", e),
+        };
     }
 } 
 
