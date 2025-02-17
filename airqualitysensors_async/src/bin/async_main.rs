@@ -76,12 +76,14 @@ async fn main(spawner: Spawner) {
 
 #[embassy_executor::task]
 async fn listen_for_signal(mut receiver: EspNowReceiver<'static>) {
-    let message = receiver.receive_async().await;
-    let received_data = from_utf8(message.data()).unwrap_or(""); 
+    loop {
+        let data = receiver.receive_async().await;
+        let received_data = from_utf8(data.data()).unwrap_or(""); 
 
-    if received_data == "REQUEST DATA" {
-        info!("Received signal from SIM808 node");
-        DATA_REQUEST_SIGNAL.signal(());
+        if received_data == "REQUEST DATA" {
+            info!("Received signal from SIM808 node");
+            DATA_REQUEST_SIGNAL.signal(());
+        }
     }
 }
 
