@@ -4,17 +4,13 @@
 #[allow(unused)]
 use communicationmodule::sensors::{ sim808::Sim808, serial::Serial };
 
-#[allow(unused)]
-use esp_hal::{ clock::CpuClock, delay::Delay };
+use esp_hal::clock::CpuClock;
+use esp_wifi::{ EspWifiController, esp_now::{ EspNowReceiver, EspNowSender, PeerInfo } };
 use esp_backtrace as _;
 use esp_println::println;
 
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
-
-
-#[allow(unused)]
-use esp_wifi::{ EspWifiController, esp_now::{ EspNowReceiver, EspNowSender, PeerInfo } };
 
 use log::info;
 
@@ -25,7 +21,6 @@ static mut INIT: MaybeUninit<EspWifiController<'static>> = MaybeUninit::uninit()
 
 #[esp_hal_embassy::main]
 async fn main(spawner: Spawner) {
-    // generator version: 0.2.2
 
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let peripherals = esp_hal::init(config);
@@ -54,40 +49,16 @@ async fn main(spawner: Spawner) {
     let peer_address = [0x40, 0x4c, 0xca, 0x4c, 0x6f, 0x18];
     manager.add_peer(PeerInfo { peer_address, lmk: None, channel: None, encrypt: false }).unwrap();
 
-    let _ = spawner;
-
-
     let mut sim808 = Sim808::new(peripherals.UART1, peripherals.GPIO20, peripherals.GPIO21, 9600).unwrap();
-    //let mut serial = Serial::new(peripherals.UART0, peripherals.GPIO17, peripherals.GPIO16, 9600).unwrap();
+    let mut _serial = Serial::new(peripherals.UART0, peripherals.GPIO17, peripherals.GPIO16, 9600).unwrap();
 
     config_sim808(&mut sim808).await;
 
     spawner.spawn(send_data_request(sender, peer_address)).unwrap();
     spawner.spawn(receive_sensor_data(receiver)).unwrap();
 
-    //let mut sim808_buffer = [0u8; 64];
-
-    //let mut serial_buffer = [0u8; 64];
-
-
-    println!("Enter AT Commands");
-
     loop {
-        /*if let Ok(bytes_read) = serial.read_command(&mut serial_buffer).await {
-            if bytes_read > 0 {
-                sim808.send_command(&serial_buffer[..bytes_read]).await.unwrap();
-                serial_buffer.fill(0);
-            }
-        }
-        
-        if let Ok(response_size) = sim808.read_response(&mut sim808_buffer).await {
-            if response_size > 0 {
-                serial.send_response(&sim808_buffer[..response_size]).await.unwrap();
-                sim808_buffer.fill(0);
-            }
-        }*/
-        
-        Timer::after(Duration::from_secs(1)).await;
+       Timer::after(Duration::from_secs(1)).await;
     }
 
 }
@@ -100,7 +71,10 @@ async fn send_data_request(
     let message = "REQUEST DATA";
 
     loop {
-        let _ = sender.send_async(&peer_address, message.as_bytes()).await;
+        match sender.send_async(&peer_address, message.as_bytes()).await {
+            Ok(_) => println!("ESP-NOW data request sent successfully"),
+            Err(e) => println!("ESP-NOW data request send failed, {:?}", e),
+        };
     }
 }
 
@@ -144,5 +118,31 @@ async fn config_sim808(sim808: &mut Sim808<'_>) {
             buffer.fill(0);
         }
     }
+
+}
+
+#[embassy_executor::task]
+async fn interact_with_sim808(mut sim808: Sim808<'static>, mut serial: Serial<'static>) {
+
+    let mut sim808_buffer = [0u8; 64];
+    let mut serial_buffer = [0u8; 64];
+
+    println!("Enter AT commands");
+
+    if let Ok(bytes_read) = serial.read_command(&mut serial_buffer).await {
+        if bytes_read > 0 {
+            sim808.send_command(&serial_buffer[..bytes_read]).await.unwrap();
+            serial_buffer.fill(0);
+        }
+    }
+        
+    if let Ok(response_size) = sim808.read_response(&mut sim808_buffer).await {
+        if response_size > 0 {
+            serial.send_response(&sim808_buffer[..response_size]).await.unwrap();
+            sim808_buffer.fill(0);
+        }
+    }
+
+    Timer::after(Duration::from_secs(1)).await;
 
 }
