@@ -72,7 +72,8 @@ async fn send_data_request(
 
     loop {
         match sender.send_async(&peer_address, message.as_bytes()).await {
-            Ok(_) => println!("ESP-NOW data request sent successfully"),
+            Ok(_) => {},
+            //println!("ESP-NOW data request sent successfully"),
             Err(e) => println!("ESP-NOW data request send failed, {:?}", e),
         };
     }
