@@ -46,7 +46,8 @@ async fn main(spawner: Spawner) {
     let esp_now = esp_wifi::esp_now::EspNow::new(init, peripherals.WIFI).unwrap();
     let (manager, sender, receiver) = esp_now.split(); 
 
-    let peer_address = [0x40, 0x4c, 0xca, 0x4c, 0x6f, 0x18];
+    let peer_address = [0x40,0x4c,0xca,0x4c,0x6f,0x18];
+
     manager.add_peer(PeerInfo { peer_address, lmk: None, channel: None, encrypt: false }).unwrap();
 
     let mut sim808 = Sim808::new(peripherals.UART1, peripherals.GPIO20, peripherals.GPIO21, 9600).unwrap();
@@ -90,6 +91,31 @@ async fn receive_sensor_data(mut receiver: EspNowReceiver<'static>) {
     }
 }
 
+#[embassy_executor::task]
+async fn interact_with_sim808(mut sim808: Sim808<'static>, mut serial: Serial<'static>) {
+
+    let mut sim808_buffer = [0u8; 64];
+    let mut serial_buffer = [0u8; 64];
+
+    println!("Enter AT commands");
+
+    if let Ok(bytes_read) = serial.read_command(&mut serial_buffer).await {
+        if bytes_read > 0 {
+            sim808.send_command(&serial_buffer[..bytes_read]).await.unwrap();
+            serial_buffer.fill(0);
+        }
+    }
+        
+    if let Ok(response_size) = sim808.read_response(&mut sim808_buffer).await {
+        if response_size > 0 {
+            serial.send_response(&sim808_buffer[..response_size]).await.unwrap();
+            sim808_buffer.fill(0);
+        }
+    }
+
+    Timer::after(Duration::from_secs(1)).await;
+}
+
 async fn config_sim808(sim808: &mut Sim808<'_>) {
     
     let mut buffer = [0u8; 64];
@@ -119,31 +145,5 @@ async fn config_sim808(sim808: &mut Sim808<'_>) {
             buffer.fill(0);
         }
     }
-
-}
-
-#[embassy_executor::task]
-async fn interact_with_sim808(mut sim808: Sim808<'static>, mut serial: Serial<'static>) {
-
-    let mut sim808_buffer = [0u8; 64];
-    let mut serial_buffer = [0u8; 64];
-
-    println!("Enter AT commands");
-
-    if let Ok(bytes_read) = serial.read_command(&mut serial_buffer).await {
-        if bytes_read > 0 {
-            sim808.send_command(&serial_buffer[..bytes_read]).await.unwrap();
-            serial_buffer.fill(0);
-        }
-    }
-        
-    if let Ok(response_size) = sim808.read_response(&mut sim808_buffer).await {
-        if response_size > 0 {
-            serial.send_response(&sim808_buffer[..response_size]).await.unwrap();
-            sim808_buffer.fill(0);
-        }
-    }
-
-    Timer::after(Duration::from_secs(1)).await;
 
 }

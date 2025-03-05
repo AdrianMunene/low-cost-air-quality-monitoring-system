@@ -3,7 +3,7 @@
 
 use airqualitysensors_async::sensors::{ bme280::Bme280, mhz19b::Mhz19b, pms5003::Pms5003 };
 
-use esp_hal::{ clock::CpuClock, delay::Delay };
+use esp_hal::{ clock::CpuClock, delay::Delay, gpio::Output };
 use esp_wifi::{ EspWifiController, esp_now::{ EspNowReceiver, EspNowSender, PeerInfo } };
 use esp_backtrace as _;
 use esp_println::println;
@@ -40,6 +40,7 @@ async fn main(spawner: Spawner) {
 
     info!("Embassy initialized!");
 
+
     let timer1 = esp_hal::timer::timg::TimerGroup::new(peripherals.TIMG0);
 
     let init = unsafe{ 
@@ -52,16 +53,18 @@ async fn main(spawner: Spawner) {
     let esp_now = esp_wifi::esp_now::EspNow::new(init, peripherals.WIFI).unwrap(); 
     let (manager, sender, receiver) = esp_now.split();
 
-    let peer_address = [0x40,0x4c,0xca,0x4c,0x44,0xd8];
+    let peer_address = [0x40, 0x4c, 0xca, 0x4c, 0x44, 0xd8];
+
     manager.add_peer(PeerInfo { peer_address, lmk: None, channel: None, encrypt: false }).unwrap();
 
+    let activate_pin = Output::new(peripherals.GPIO10, esp_hal::gpio::Level::High);
     let mhz19b = Mhz19b::new(peripherals.UART0, peripherals.GPIO17, peripherals.GPIO16, 9600).unwrap();
     let pms5003 = Pms5003::new(peripherals.UART1, peripherals.GPIO20, peripherals.GPIO21, 9600).unwrap(); 
     let mut bme280 = Bme280::new(peripherals.I2C0, peripherals.GPIO6, peripherals.GPIO7).unwrap();
     bme280.init(&mut delay);
 
     spawner.spawn(listen_for_signal(receiver)).unwrap();
-    spawner.spawn(send_data(sender, peer_address, pms5003, mhz19b, bme280)).unwrap();
+    spawner.spawn(send_data(sender, peer_address, pms5003, mhz19b, bme280, activate_pin)).unwrap();
 
     loop {
         Timer::after(Duration::from_secs(1)).await;
@@ -87,10 +90,13 @@ async fn send_data(
     peer_address: [u8; 6],
     mut pms5003: Pms5003<'static>,
     mut mhz19b: Mhz19b<'static>,
-    mut bme280: Bme280<'static>,) {
+    mut bme280: Bme280<'static>, 
+    mut activate_pin: Output<'static>,) {
     loop {
 
         DATA_REQUEST_SIGNAL.wait().await;
+
+        activate_pin.set_high();
 
         let ((pm_data, co2_data), bme_data) = 
         join(
