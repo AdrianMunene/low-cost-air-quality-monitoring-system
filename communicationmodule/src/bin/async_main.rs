@@ -77,6 +77,7 @@ async fn send_data_request(
             //println!("ESP-NOW data request sent successfully"),
             Err(e) => println!("ESP-NOW data request send failed, {:?}", e),
         };
+        Timer::after(Duration::from_secs(5)).await;
     }
 }
 

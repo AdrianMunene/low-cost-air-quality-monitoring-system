@@ -57,7 +57,9 @@ async fn main(spawner: Spawner) {
 
     manager.add_peer(PeerInfo { peer_address, lmk: None, channel: None, encrypt: false }).unwrap();
 
-    let activate_pin = Output::new(peripherals.GPIO10, esp_hal::gpio::Level::High);
+    let activate_pin = Output::new(peripherals.GPIO10, esp_hal::gpio::Level::Low);
+    let mq7_activate_pin = Output::new(peripherals.GPIO11, esp_hal::gpio::Level::Low);
+
     let mhz19b = Mhz19b::new(peripherals.UART0, peripherals.GPIO17, peripherals.GPIO16, 9600).unwrap();
     let pms5003 = Pms5003::new(peripherals.UART1, peripherals.GPIO20, peripherals.GPIO21, 9600).unwrap(); 
     let mut bme280 = Bme280::new(peripherals.I2C0, peripherals.GPIO6, peripherals.GPIO7).unwrap();
@@ -78,7 +80,6 @@ async fn listen_for_signal(mut receiver: EspNowReceiver<'static>) {
         let received_data = core::str::from_utf8(data.data()).unwrap_or(""); 
 
         if received_data == "REQUEST DATA" {
-            println!("Received signal from SIM808 node");
             DATA_REQUEST_SIGNAL.signal(());
         }
     }
