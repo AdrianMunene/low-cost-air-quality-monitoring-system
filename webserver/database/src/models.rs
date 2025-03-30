@@ -1,3 +1,4 @@
+use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use diesel::sqlite::Sqlite;
 use crate::schema::air_quality_data;
@@ -7,7 +8,7 @@ use crate::schema::air_quality_data;
 #[diesel(check_for_backend(Sqlite))]
 pub struct AirQualityData {
     pub id: i32,
-    pub timestamp: String,
+    pub timestamp: NaiveDateTime,
     pub longitude: Option<f64>,
     pub latitude: Option<f64>,
     pub temperature: Option<f64>,
@@ -24,7 +25,7 @@ pub struct AirQualityData {
 #[derive(Insertable)]
 #[diesel(table_name = air_quality_data)]
 pub struct NewAirQualityData {
-    pub timestamp: String,
+    pub timestamp: NaiveDateTime,
     pub longitude: Option<f64>,
     pub latitude: Option<f64>,
     pub temperature: Option<f64>,
