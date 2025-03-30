@@ -1,1 +1,0 @@
-/home/halfadrian/low-cost-air-quality-monitoring-system/webserver/database/target/debug/libdatabase.rlib: /home/halfadrian/low-cost-air-quality-monitoring-system/webserver/database/src/lib.rs /home/halfadrian/low-cost-air-quality-monitoring-system/webserver/database/src/models.rs /home/halfadrian/low-cost-air-quality-monitoring-system/webserver/database/src/schema.rs
