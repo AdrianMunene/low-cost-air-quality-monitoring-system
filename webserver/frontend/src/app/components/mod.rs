@@ -1,1 +1,1 @@
-pub mod line_chart;
+pub mod time_series_chart;
