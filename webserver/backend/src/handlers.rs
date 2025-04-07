@@ -50,7 +50,10 @@ pub async fn create_air_quality_record(
         o3: input.o3,
     };
 
-    diesel::insert_into(air_quality_data).values(&new_record).execute(&mut conn).map_err(|e| e.to_string())?;
+    diesel::insert_into(air_quality_data)
+    .values(&new_record)
+    .execute(&mut conn)
+    .map_err(|e| e.to_string())?;
 
     Ok(Json(json!({ "status": "success" })))
 }
