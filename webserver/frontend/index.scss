@@ -1,35 +1,23 @@
-html,
 body {
-  height: 100%;
-  margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-body {
-  align-items: center;
-  display: flex;
-  justify-content: center;
-
-  background: linear-gradient(to bottom right, #444444, #009a5b);
-  font-size: 1.5rem;
+#root {
+    width: 80%;
+    max-width: 1200px;
+    text-align: center;
 }
 
-main {
-  color: #fff6d5;
-  font-family: sans-serif;
-  text-align: center;
-}
-
-.logo {
-  height: 20em;
-}
-
-.heart:after {
-  content: "❤️";
-
-  font-size: 1.75em;
-}
-
-h1 + .subtitle {
-  display: block;
-  margin-top: -1em;
+canvas {
+    display: block;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    background-color: #ffffff;
 }
