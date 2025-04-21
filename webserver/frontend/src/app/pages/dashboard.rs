@@ -12,28 +12,87 @@ pub fn dashboard() -> Html {
     html! {
         <div class="dashboard-wrapper">
             <h2 class="dashboard-title">{ "Air Quality Dashboard" }</h2>
+
+            // Main grid with all charts
             <div class="dashboard-grid">
-                // PM Chart spans full width in first row
-                <div class="chart-container pm-chart">
-                    <ParticulateMatterChart />
+                // PM Chart spans full width
+                <div class="chart-container grid-item-1-1">
+                    <div class="chart-header">
+                        <h3>{ "Particulate Matter" }</h3>
+                        <span class="chart-subtitle">{ "µg/m³" }</span>
+                    </div>
+                    <div class="chart-content">
+                        <ParticulateMatterChart />
+                    </div>
                 </div>
+
+                // Temperature chart
                 <div class="chart-container">
-                    <TemperatureChart />
+                    <div class="chart-header">
+                        <h3>{ "Temperature" }</h3>
+                        <span class="chart-subtitle">{ "°C" }</span>
+                    </div>
+                    <div class="chart-content">
+                        <TemperatureChart />
+                    </div>
                 </div>
+
+                // Humidity chart
                 <div class="chart-container">
-                    <HumidityChart />
+                    <div class="chart-header">
+                        <h3>{ "Humidity" }</h3>
+                        <span class="chart-subtitle">{ "%" }</span>
+                    </div>
+                    <div class="chart-content">
+                        <HumidityChart />
+                    </div>
                 </div>
+
+                // Pressure chart
                 <div class="chart-container">
-                    <PressureChart />
+                    <div class="chart-header">
+                        <h3>{ "Pressure" }</h3>
+                        <span class="chart-subtitle">{ "hPa" }</span>
+                    </div>
+                    <div class="chart-content">
+                        <PressureChart />
+                    </div>
                 </div>
+            </div>
+
+            // Secondary grid for remaining charts
+            <div class="dashboard-grid-secondary">
+                // CO2 chart
                 <div class="chart-container">
-                    <CarbonIVOxideChart />
+                    <div class="chart-header">
+                        <h3>{ "Carbon Dioxide" }</h3>
+                        <span class="chart-subtitle">{ "CO₂ (ppm)" }</span>
+                    </div>
+                    <div class="chart-content">
+                        <CarbonIVOxideChart />
+                    </div>
                 </div>
+
+                // CO chart
                 <div class="chart-container">
-                    <CarbonIIOxideChart />
+                    <div class="chart-header">
+                        <h3>{ "Carbon Monoxide" }</h3>
+                        <span class="chart-subtitle">{ "CO (ppm)" }</span>
+                    </div>
+                    <div class="chart-content">
+                        <CarbonIIOxideChart />
+                    </div>
                 </div>
+
+                // Ozone chart
                 <div class="chart-container">
-                    <OzoneChart />
+                    <div class="chart-header">
+                        <h3>{ "Ozone" }</h3>
+                        <span class="chart-subtitle">{ "O₃ (ppb)" }</span>
+                    </div>
+                    <div class="chart-content">
+                        <OzoneChart />
+                    </div>
                 </div>
             </div>
         </div>

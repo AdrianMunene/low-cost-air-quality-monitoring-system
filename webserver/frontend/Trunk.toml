@@ -1,0 +1,26 @@
+[build]
+# The index HTML file to drive the bundling process.
+target = "index.html"
+# Build in release mode.
+release = false
+# The output dir for all final assets.
+dist = "dist"
+# The public URL from which assets are to be served.
+public_url = "/"
+
+[watch]
+# Paths to watch for changes
+watch = ["src/", "index.scss", "index.html"]
+
+[serve]
+# The address to serve on.
+address = "127.0.0.1"
+# The port to serve on.
+port = 8080
+# Open a browser tab once the initial build is complete.
+open = false
+
+[[hooks]]
+stage = "pre_build"
+command = "sass"
+command_arguments = ["index.scss", "index.css"]

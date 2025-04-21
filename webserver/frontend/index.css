@@ -97,16 +97,16 @@ body {
     height: 220px; /* Fixed height for all charts */
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.05);
+}
 
-    &:hover {
-        box-shadow: 0 4px 8px var(--shadow-color);
-        transform: translateY(-2px);
-    }
+.chart-container:hover {
+    box-shadow: 0 4px 8px var(--shadow-color);
+    transform: translateY(-2px);
+}
 
-    /* Make the PM chart taller */
-    &.grid-item-1-1 {
-        height: 250px;
-    }
+/* Make the PM chart taller */
+.chart-container.grid-item-1-1 {
+    height: 250px;
 }
 
 /* Chart Header */
@@ -118,19 +118,19 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
 
-    h3 {
-        margin: 0;
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-color);
-    }
+.chart-header h3 {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
 
-    .chart-subtitle {
-        font-size: 0.75rem;
-        color: var(--text-secondary);
-        margin-left: auto;
-    }
+.chart-header .chart-subtitle {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-left: auto;
 }
 
 /* Chart Content */
@@ -180,55 +180,55 @@ canvas {
     align-items: center;
     box-shadow: 0 1px 3px var(--shadow-color);
     z-index: 10;
+}
 
-    h1 {
-        margin: 0;
-        font-size: 16px;
-        font-weight: 600;
-        flex: 1;
-        color: var(--text-color);
-    }
+.app-header h1 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    flex: 1;
+    color: var(--text-color);
+}
 
-    .logo {
-        margin-right: 12px;
-        display: flex;
-        align-items: center;
-        color: var(--accent-color);
+.app-header .logo {
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    color: var(--accent-color);
+}
 
-        svg {
-            width: 20px;
-            height: 20px;
-        }
-    }
+.app-header .logo svg {
+    width: 20px;
+    height: 20px;
+}
 
-    .header-actions {
-        display: flex;
-        align-items: center;
-    }
+.app-header .header-actions {
+    display: flex;
+    align-items: center;
+}
 
-    .status-indicator {
-        font-size: 11px;
-        padding: 3px 8px;
-        border-radius: 12px;
-        background-color: rgba(0, 0, 0, 0.2);
-        display: flex;
-        align-items: center;
+.app-header .status-indicator {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+}
 
-        &.online {
-            color: white;
+.app-header .status-indicator.online {
+    color: white;
+}
 
-            &::before {
-                content: '';
-                display: inline-block;
-                width: 6px;
-                height: 6px;
-                border-radius: 50%;
-                background-color: var(--online-indicator);
-                margin-right: 5px;
-                animation: pulse 2s infinite;
-            }
-        }
-    }
+.app-header .status-indicator.online::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--online-indicator);
+    margin-right: 5px;
+    animation: pulse 2s infinite;
 }
 
 /* Main Content Area */
@@ -249,10 +249,10 @@ canvas {
     padding: 6px 16px;
     text-align: center;
     font-size: 11px;
+}
 
-    p {
-        margin: 0;
-    }
+.app-footer p {
+    margin: 0;
 }
 
 /* Animation for the live indicator */
@@ -309,27 +309,27 @@ canvas {
 
     .app-header {
         padding: 0.5rem 0.75rem;
+    }
 
-        h1 {
-            font-size: 0.875rem;
-        }
+    .app-header h1 {
+        font-size: 0.875rem;
+    }
 
-        .logo svg {
-            width: 18px;
-            height: 18px;
-        }
+    .app-header .logo svg {
+        width: 18px;
+        height: 18px;
     }
 
     .chart-header {
         padding: 0.5rem 0.75rem;
+    }
 
-        h3 {
-            font-size: 0.75rem;
-        }
+    .chart-header h3 {
+        font-size: 0.75rem;
+    }
 
-        .chart-subtitle {
-            font-size: 0.625rem;
-        }
+    .chart-header .chart-subtitle {
+        font-size: 0.625rem;
     }
 
     .chart-container {

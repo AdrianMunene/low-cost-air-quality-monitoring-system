@@ -4,19 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Air Quality Monitoring</title>
-    <!-- Import the CSS for your app -->
+    <!-- Import the styles for your app -->
+    <link data-trunk rel="scss" href="index.scss">
+    <!-- Fallback for when not using Trunk -->
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
     <div id="root"></div>
-    <!-- Import the WebAssembly module and JavaScript -->
-    <script type="module">
-       import init from './dist/frontend-e1255329587606a8.js';
-        init().then(() => {
-            console.log('Yew app initialized');
-        }).catch((err) => {
-            console.error('Error initializing Yew app:', err);
-        });
-    </script>
+    <!-- Trunk will automatically inject the WebAssembly module and JavaScript -->
+    <link data-trunk rel="copy-dir" href="assets">
+    <link data-trunk rel="rust" href="Cargo.toml">
 </body>
 </html>
