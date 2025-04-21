@@ -31,13 +31,8 @@ body {
     font-weight: 600;
 }
 
-.pm-chart-container {
-    flex: 0 0 auto;
-    height: 38vh;
-}
-
 .dashboard-grid {
-    flex: 1 1 auto;
+    flex: 1;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, 1fr);
@@ -48,7 +43,7 @@ body {
 .chart-container {
     background-color: #333333;
     border-radius: 8px;
-    padding: 12px;
+    padding: 16px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
@@ -56,6 +51,11 @@ body {
     
     &:hover {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    // Special styling for the PM chart to span full width
+    &.pm-chart {
+        grid-column: span 3;
     }
 }
 

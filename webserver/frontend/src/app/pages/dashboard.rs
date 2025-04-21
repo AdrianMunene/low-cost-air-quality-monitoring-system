@@ -12,16 +12,11 @@ pub fn dashboard() -> Html {
     html! {
         <div class="dashboard-wrapper">
             <h2 class="dashboard-title">{ "Air Quality Dashboard" }</h2>
-            
-            // PM Chart in its own row
-            <div class="pm-chart-container">
-                <div class="chart-container">
+            <div class="dashboard-grid">
+                // PM Chart spans full width in first row
+                <div class="chart-container pm-chart">
                     <ParticulateMatterChart />
                 </div>
-            </div>
-
-            // Grid for other charts
-            <div class="dashboard-grid">
                 <div class="chart-container">
                     <TemperatureChart />
                 </div>
