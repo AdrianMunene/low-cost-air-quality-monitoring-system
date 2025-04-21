@@ -45,35 +45,61 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
     {
         let config = props.config.clone();
         let canvas_ref = canvas_ref.clone();
-        // use_effect_with accepts a dependency (here, the config) that must implement PartialEq.
         use_effect_with(config, move |config| {
             if let Some(canvas) = canvas_ref.cast::<HtmlCanvasElement>() {
+                // Get device pixel ratio for high DPI displays
+                let dpr = web_sys::window()
+                    .unwrap()
+                    .device_pixel_ratio();
+                
+                // Get canvas display size
+                let display_width = canvas.client_width() as u32;
+                let display_height = canvas.client_height() as u32;
+                
+                // Calculate actual pixel dimensions
+                let pixel_width = (display_width as f64 * dpr) as u32;
+                let pixel_height = (display_height as f64 * dpr) as u32;
+                
+                // Set canvas buffer dimensions
+                canvas.set_width(pixel_width);
+                canvas.set_height(pixel_height);
+
                 let backend = CanvasBackend::with_canvas_object(canvas)
                     .expect("Failed to create CanvasBackend");
                 let root_area = backend.into_drawing_area();
-                // Clear the drawing area.
-                root_area.fill(&RGBColor(20, 20, 30)).unwrap();
+                
+                // Dark grey background
+                root_area.fill(&RGBColor(40, 40, 40)).unwrap();
 
-                // Build the chart.
                 let mut chart = ChartBuilder::on(&root_area)
-                    .set_label_area_size(LabelAreaPosition::Left, 100)
-                    .set_label_area_size(LabelAreaPosition::Bottom, 100)
-                    .caption(&config.caption, ("sans-serif", 40).into_font().color(&WHITE))
+                    .set_label_area_size(LabelAreaPosition::Left, pixel_width / 8)
+                    .set_label_area_size(LabelAreaPosition::Bottom, pixel_height / 8)
+                    .set_label_area_size(LabelAreaPosition::Right, pixel_width / 20)
+                    .set_label_area_size(LabelAreaPosition::Top, pixel_height / 20)
+                    .caption(
+                        &config.caption,
+                        ("sans-serif", (pixel_height as f32 * 0.04) as u32).into_font().color(&WHITE)
+                    )
                     .build_cartesian_2d(config.x_range.clone(), config.y_range.clone())
                     .unwrap();
 
-                // Configure the mesh.
+                // Configure mesh with white grid and text
                 chart.configure_mesh()
                     .x_desc(&config.x_desc)
                     .y_desc(&config.y_desc)
                     .x_labels(config.x_labels)
-                    .x_label_formatter(&|dt: &DateTime<Utc>| dt.format("%Y-%m-%d").to_string())
+                    .axis_style(WHITE.mix(0.8))
+                    .light_line_style(WHITE.mix(0.2))
+                    .bold_line_style(WHITE.mix(0.4))
+                    .label_style(("sans-serif", (pixel_height as f32 * 0.025) as u32).into_font().color(&WHITE))
+                    .x_label_formatter(&|dt: &DateTime<Utc>| dt.format("%H:%M").to_string())
                     .draw()
                     .unwrap();
 
-                // Draw each series.
+                // Draw each series with thicker lines
                 for series in config.series.iter() {
-                    let style = ShapeStyle::from(&series.color).stroke_width(4);
+                    let style = ShapeStyle::from(&series.color)
+                        .stroke_width((pixel_width as f32 * 0.003) as u32);
                     chart.draw_series(
                         LineSeries::new(
                             series.data.iter().map(|p| (p.timestamp, p.value)),
@@ -86,12 +112,13 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                     });
                 }
 
-                // Draw the legend.
+                // Draw legend with white text
                 chart.configure_series_labels()
-                    .background_style(&RGBColor(20, 20, 30).mix(0.9))
-                    .border_style(&WHITE)
-                    .label_font(("sans-serif", 20).into_font().color(&WHITE))
-                    .position(SeriesLabelPosition::MiddleRight)
+                    .background_style(&RGBColor(40, 40, 40).mix(0.9))
+                    .border_style(&WHITE.mix(0.8))
+                    .label_font(("sans-serif", (pixel_height as f32 * 0.025) as u32).into_font().color(&WHITE))
+                    .position(SeriesLabelPosition::UpperRight)
+                    .margin(10)
                     .draw()
                     .unwrap();
             }
@@ -100,6 +127,8 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
     }
 
     html! {
-        <canvas ref={canvas_ref} width="800" height="600"></canvas>
+        <div style="width: 100%; height: 100%; position: relative;">
+            <canvas ref={canvas_ref} style="width: 100%; height: 100%;"/>
+        </div>
     }
 }

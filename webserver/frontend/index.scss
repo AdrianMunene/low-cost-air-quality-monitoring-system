@@ -1,67 +1,71 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    background-color: #282828;
     margin: 0;
     padding: 0;
     height: 100vh;
+    width: 100vw;
     overflow: hidden;
 }
 
 #root {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+    width: 100%;
+    height: 100%;
 }
 
 .dashboard-wrapper {
-    padding: 2vh;
-    height: 100vh;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+    gap: 16px;
 }
 
 .dashboard-title {
-    color: #333;
+    color: white;
     text-align: center;
-    margin-bottom: 2vh;
-    font-size: 1.8em;
+    margin: 0;
+    padding: 8px 0;
+    font-size: 24px;
     font-weight: 600;
 }
 
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);  // 3 columns
-    grid-template-rows: repeat(2, 1fr);     // 2 rows
-    gap: 2vh;
-    height: calc(100vh - 15vh); // Adjust based on your title and padding
-    overflow: hidden;
+.pm-chart-container {
+    flex: 0 0 auto;
+    height: 38vh;
 }
 
-.pm-chart-container {
-    margin-top: 2vh;
-    height: 30vh;  // Fixed height for PM chart
+.dashboard-grid {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 16px;
+    min-height: 0; // Important for Firefox
 }
 
 .chart-container {
-    background-color: #fff;
+    background-color: #333333;
     border-radius: 8px;
-    padding: 1vh;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    height: 100%; // Fill the grid cell
-
+    position: relative;
+    
     &:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     }
 }
 
+// Ensure canvas takes full space of container
 canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100% !important;
     height: 100% !important;
-    object-fit: contain;
 }
 
 // High-DPI screen support
