@@ -48,7 +48,8 @@ body {
     padding: 1rem;
     box-sizing: border-box;
     background-color: var(--page-bg);
-    overflow: auto; /* Allow scrolling if needed */
+    overflow-y: auto; /* Allow vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 .dashboard-title {
@@ -62,56 +63,53 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
-/* Main chart grid */
+/* Main chart grid - 2x2 layout */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
     width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-/* Secondary chart grid */
-.dashboard-grid-secondary {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    width: 100%;
-}
-
-/* Special styling for the PM chart to span full width */
+/* Special styling for the PM chart to span both columns */
 .grid-item-1-1 {
-    grid-column: 1 / span 3;
+    grid-column: 1 / span 2;
 }
 
 /* Chart Containers */
 .chart-container {
     background-color: var(--card-bg);
-    border-radius: 0.25rem;
-    box-shadow: 0 2px 4px var(--shadow-color);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px var(--shadow-color);
     display: flex;
     flex-direction: column;
     position: relative;
     overflow: hidden;
     transition: all 0.2s ease;
-    height: 220px; /* Fixed height for all charts */
     width: 100%;
     border: 1px solid rgba(255, 255, 255, 0.05);
 
     &:hover {
-        box-shadow: 0 4px 8px var(--shadow-color);
+        box-shadow: 0 6px 12px var(--shadow-color);
         transform: translateY(-2px);
     }
 
-    /* Make the PM chart taller */
-    &.grid-item-1-1 {
-        height: 250px;
+    /* Large chart (PM chart at top) */
+    &.chart-large {
+        height: 500px;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Medium charts (2x2 grid) */
+    &.chart-medium {
+        height: 450px;
     }
 }
 
 /* Chart Header */
 .chart-header {
-    padding: 0.75rem 1rem;
+    padding: 1rem 1.25rem;
     background-color: var(--chart-header-bg);
     border-bottom: 1px solid var(--border-color);
     z-index: 2;
@@ -121,13 +119,13 @@ body {
 
     h3 {
         margin: 0;
-        font-size: 0.875rem;
+        font-size: 1rem;
         font-weight: 600;
         color: var(--text-color);
     }
 
     .chart-subtitle {
-        font-size: 0.75rem;
+        font-size: 0.875rem;
         color: var(--text-secondary);
         margin-left: auto;
     }
@@ -142,9 +140,69 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden; /* Prevent overflow */
 }
 
-/* Ensure canvas takes full space of container */
+/* Inner chart container for proper positioning */
+.chart-container-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Prevent overflow */
+    border-radius: 4px;
+}
+
+/* Chart container for mobile */
+.chart-container {
+    height: 200px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+/* Chart wrapper for consistent sizing */
+.chart-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    padding: 2px; /* Add a small padding */
+}
+
+/* Loading indicator for charts */
+.chart-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    z-index: 5;
+}
+
+/* Error message for charts */
+.chart-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    z-index: 10;
+}
+
+/* Ensure canvas takes full space of container with improved rendering */
 canvas {
     position: absolute;
     top: 0;
@@ -153,13 +211,22 @@ canvas {
     height: 100% !important;
     display: block;
     z-index: 1;
+    image-rendering: high-quality; /* High quality rendering */
+    image-rendering: -webkit-optimize-contrast; /* Improve rendering on Webkit */
+    image-rendering: crisp-edges; /* Improve rendering on Firefox */
+    shape-rendering: geometricPrecision; /* Improve line rendering */
+    text-rendering: geometricPrecision; /* Improve text rendering */
+    transform: translateZ(0); /* Force GPU acceleration */
+    backface-visibility: hidden; /* Reduce blurriness */
 }
 
 /* High-DPI screen support */
 @media screen and (min-resolution: 2dppx) {
     canvas {
-        transform: scale(0.5);
-        transform-origin: 0 0;
+        transform: translateZ(0); /* Force GPU acceleration even on high-DPI */
+        image-rendering: high-quality;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
     }
 }
 
@@ -273,9 +340,9 @@ canvas {
 
 /* Responsive Adjustments */
 @media (max-width: 1200px) {
-    .dashboard-grid,
-    .dashboard-grid-secondary {
+    .dashboard-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
     }
 
     .grid-item-1-1 {
@@ -285,17 +352,36 @@ canvas {
     .app-header h1 {
         font-size: 1rem;
     }
+
+    .chart-container {
+        &.chart-large {
+            height: 450px;
+        }
+
+        &.chart-medium {
+            height: 400px;
+        }
+    }
 }
 
 @media (max-width: 768px) {
-    .dashboard-grid,
-    .dashboard-grid-secondary {
+    .dashboard-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
     .grid-item-1-1 {
         grid-column: 1;
-        height: 220px;
+    }
+
+    .chart-container {
+        &.chart-large {
+            height: 350px;
+        }
+
+        &.chart-medium {
+            height: 300px;
+        }
     }
 
     .dashboard-wrapper {
@@ -321,18 +407,14 @@ canvas {
     }
 
     .chart-header {
-        padding: 0.5rem 0.75rem;
+        padding: 0.75rem 1rem;
 
         h3 {
-            font-size: 0.75rem;
+            font-size: 0.875rem;
         }
 
         .chart-subtitle {
-            font-size: 0.625rem;
+            font-size: 0.75rem;
         }
-    }
-
-    .chart-container {
-        height: 200px;
     }
 }

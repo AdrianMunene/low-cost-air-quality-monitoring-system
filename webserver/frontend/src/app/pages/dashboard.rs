@@ -15,8 +15,8 @@ pub fn dashboard() -> Html {
 
             // Main grid with all charts
             <div class="dashboard-grid">
-                // PM Chart spans full width
-                <div class="chart-container grid-item-1-1">
+                // PM Chart spans full width at the top
+                <div class="chart-container grid-item-1-1 chart-large">
                     <div class="chart-header">
                         <h3>{ "Particulate Matter" }</h3>
                         <span class="chart-subtitle">{ "µg/m³" }</span>
@@ -27,7 +27,7 @@ pub fn dashboard() -> Html {
                 </div>
 
                 // Temperature chart
-                <div class="chart-container">
+                <div class="chart-container chart-medium">
                     <div class="chart-header">
                         <h3>{ "Temperature" }</h3>
                         <span class="chart-subtitle">{ "°C" }</span>
@@ -38,7 +38,7 @@ pub fn dashboard() -> Html {
                 </div>
 
                 // Humidity chart
-                <div class="chart-container">
+                <div class="chart-container chart-medium">
                     <div class="chart-header">
                         <h3>{ "Humidity" }</h3>
                         <span class="chart-subtitle">{ "%" }</span>
@@ -49,7 +49,7 @@ pub fn dashboard() -> Html {
                 </div>
 
                 // Pressure chart
-                <div class="chart-container">
+                <div class="chart-container chart-medium">
                     <div class="chart-header">
                         <h3>{ "Pressure" }</h3>
                         <span class="chart-subtitle">{ "hPa" }</span>
@@ -58,12 +58,9 @@ pub fn dashboard() -> Html {
                         <PressureChart />
                     </div>
                 </div>
-            </div>
 
-            // Secondary grid for remaining charts
-            <div class="dashboard-grid-secondary">
                 // CO2 chart
-                <div class="chart-container">
+                <div class="chart-container chart-medium">
                     <div class="chart-header">
                         <h3>{ "Carbon Dioxide" }</h3>
                         <span class="chart-subtitle">{ "CO₂ (ppm)" }</span>
@@ -74,7 +71,7 @@ pub fn dashboard() -> Html {
                 </div>
 
                 // CO chart
-                <div class="chart-container">
+                <div class="chart-container chart-medium">
                     <div class="chart-header">
                         <h3>{ "Carbon Monoxide" }</h3>
                         <span class="chart-subtitle">{ "CO (ppm)" }</span>
@@ -85,7 +82,7 @@ pub fn dashboard() -> Html {
                 </div>
 
                 // Ozone chart
-                <div class="chart-container">
+                <div class="chart-container chart-medium">
                     <div class="chart-header">
                         <h3>{ "Ozone" }</h3>
                         <span class="chart-subtitle">{ "O₃ (ppb)" }</span>

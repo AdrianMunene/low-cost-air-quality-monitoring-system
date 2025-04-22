@@ -9,7 +9,15 @@ use plotters::prelude::*;
 use std::ops::Range;
 
 fn parse_timestamp(ts: &str) -> Result<DateTime<Utc>, chrono::format::ParseError> {
-    DateTime::parse_from_str(ts, "%Y-%m-%d %H:%M:%S").map(|dt| dt.with_timezone(&Utc))
+    // Try parsing with different formats
+    let result = DateTime::parse_from_str(ts, "%Y-%m-%d %H:%M:%S %z");
+    if result.is_ok() {
+        return result.map(|dt| dt.with_timezone(&Utc));
+    }
+
+    // Try without timezone
+    DateTime::parse_from_str(&format!("{} +0000", ts), "%Y-%m-%d %H:%M:%S %z")
+        .map(|dt| dt.with_timezone(&Utc))
 }
 
 #[function_component(CarbonIIOxideChart)]
@@ -24,9 +32,14 @@ pub fn carbon_ii_oxide_chart() -> Html {
                     let mut series_co: Vec<DataPoint> = Vec::new();
 
                     for record in fetched_data.into_iter() {
-                        if let Ok(timestamp) = parse_timestamp(&record.timestamp) {
-                            if let Some(val) = record.co {
-                                series_co.push(DataPoint { timestamp, value: val });
+                        match parse_timestamp(&record.timestamp) {
+                            Ok(timestamp) => {
+                                if let Some(val) = record.co {
+                                    series_co.push(DataPoint { timestamp, value: val });
+                                }
+                            },
+                            Err(e) => {
+                                log::warn!("Failed to parse timestamp: {} - Error: {}", record.timestamp, e);
                             }
                         }
                     }
@@ -41,15 +54,24 @@ pub fn carbon_ii_oxide_chart() -> Html {
                         (Utc::now(), Utc::now())
                     };
 
-                    // Determine the y-axis range
-                    let y_min = series_co.iter().map(|p| p.value).fold(f64::INFINITY, f64::min);
-                    let y_max = series_co.iter().map(|p| p.value).fold(f64::NEG_INFINITY, f64::max);
-                    // Default range for CO (0-50 ppm is a typical range for ambient monitoring)
-                    let y_range: Range<f64> = if y_min < y_max { 
-                        y_min..y_max 
-                    } else { 
-                        0.0..50.0 
+                    // Determine the y-axis range with padding
+                    let y_min = if series_co.is_empty() {
+                        0.0
+                    } else {
+                        let min = series_co.iter().map(|p| p.value).fold(f64::INFINITY, f64::min);
+                        // Add 10% padding at the bottom, but don't go below zero for CO values
+                        (min * 0.9).max(0.0)
                     };
+
+                    let y_max = if series_co.is_empty() {
+                        50.0 // Default max if no data (typical range for ambient monitoring)
+                    } else {
+                        let max = series_co.iter().map(|p| p.value).fold(f64::NEG_INFINITY, f64::max);
+                        // Add 10% padding at the top
+                        max * 1.1
+                    };
+
+                    let y_range: Range<f64> = y_min..y_max;
 
                     // Build chart series
                     let chart_series_co = ChartSeries {
@@ -81,12 +103,12 @@ pub fn carbon_ii_oxide_chart() -> Html {
     }
 
     html! {
-        <div>
+        <div class="chart-wrapper">
             {
                 if let Some(config) = &*chart_config {
                     html! { <TimeSeriesChart config={config.config.clone()} /> }
                 } else {
-                    html! { <p>{ "Loading CO data..." }</p> }
+                    html! { <div class="chart-loading">{ "Loading CO data..." }</div> }
                 }
             }
         </div>

@@ -9,7 +9,15 @@ use plotters::prelude::*; // For BLUE, GREEN, RED
 use std::ops::Range;
 
 fn parse_timestamp(ts: &str) -> Result<DateTime<Utc>, chrono::format::ParseError> {
-    DateTime::parse_from_str(ts, "%Y-%m-%d %H:%M:%S").map(|dt| dt.with_timezone(&Utc))
+    // Try parsing with different formats
+    let result = DateTime::parse_from_str(ts, "%Y-%m-%d %H:%M:%S %z");
+    if result.is_ok() {
+        return result.map(|dt| dt.with_timezone(&Utc));
+    }
+
+    // Try without timezone
+    DateTime::parse_from_str(&format!("{} +0000", ts), "%Y-%m-%d %H:%M:%S %z")
+        .map(|dt| dt.with_timezone(&Utc))
 }
 
 #[function_component(ParticulateMatterChart)]
@@ -26,15 +34,20 @@ pub fn particulate_matter_chart() -> Html {
                     let mut series_pm10: Vec<DataPoint> = Vec::new();
 
                     for record in fetched_data.into_iter() {
-                        if let Ok(timestamp) = parse_timestamp(&record.timestamp) {
-                            if let Some(val) = record.pm1_0 {
-                                series_pm1.push(DataPoint { timestamp, value: val });
-                            }
-                            if let Some(val) = record.pm2_5 {
-                                series_pm2.push(DataPoint { timestamp, value: val });
-                            }
-                            if let Some(val) = record.pm10 {
-                                series_pm10.push(DataPoint { timestamp, value: val });
+                        match parse_timestamp(&record.timestamp) {
+                            Ok(timestamp) => {
+                                if let Some(val) = record.pm1_0 {
+                                    series_pm1.push(DataPoint { timestamp, value: val });
+                                }
+                                if let Some(val) = record.pm2_5 {
+                                    series_pm2.push(DataPoint { timestamp, value: val });
+                                }
+                                if let Some(val) = record.pm10 {
+                                    series_pm10.push(DataPoint { timestamp, value: val });
+                                }
+                            },
+                            Err(e) => {
+                                log::warn!("Failed to parse timestamp: {} - Error: {}", record.timestamp, e);
                             }
                         }
                     }
@@ -57,9 +70,25 @@ pub fn particulate_matter_chart() -> Html {
                         .chain(series_pm10.iter())
                         .map(|p| p.value)
                         .collect();
-                    let y_min = all_values.iter().cloned().fold(f64::INFINITY, f64::min);
-                    let y_max = all_values.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
-                    let y_range: Range<f64> = if y_min < y_max { y_min..y_max } else { 0.0..1.0 };
+
+                    // Calculate y-axis range with padding
+                    let y_min = if all_values.is_empty() {
+                        0.0
+                    } else {
+                        let min = all_values.iter().cloned().fold(f64::INFINITY, f64::min);
+                        // Add 10% padding at the bottom, but don't go below zero for PM values
+                        (min * 0.9).max(0.0)
+                    };
+
+                    let y_max = if all_values.is_empty() {
+                        10.0 // Default max if no data
+                    } else {
+                        let max = all_values.iter().cloned().fold(f64::NEG_INFINITY, f64::max);
+                        // Add 10% padding at the top
+                        max * 1.1
+                    };
+
+                    let y_range: Range<f64> = y_min..y_max;
 
                     // Build chart series.
                     let chart_series_pm1 = ChartSeries {
@@ -101,12 +130,12 @@ pub fn particulate_matter_chart() -> Html {
     }
 
     html! {
-        <div>
+        <div class="chart-wrapper">
             {
                 if let Some(config) = &*chart_config {
                     html! { <TimeSeriesChart config={config.config.clone()} /> }
                 } else {
-                    html! { <p>{ "Loading particulate matter data..." }</p> }
+                    html! { <div class="chart-loading">{ "Loading particulate matter data..." }</div> }
                 }
             }
         </div>
