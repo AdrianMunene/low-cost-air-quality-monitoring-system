@@ -1,18 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
     <title>Air Quality Monitoring</title>
-    <!-- Import the styles for your app -->
-    <link data-trunk rel="scss" href="index.scss">
-    <!-- Fallback for when not using Trunk -->
-    <link rel="stylesheet" href="index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link data-trunk rel="sass" href="index.scss">
+    <link data-trunk rel="copy-dir" href="assets">
+    <link data-trunk rel="rust" href="Cargo.toml">
 </head>
 <body>
     <div id="root"></div>
-    <!-- Trunk will automatically inject the WebAssembly module and JavaScript -->
-    <link data-trunk rel="copy-dir" href="assets">
-    <link data-trunk rel="rust" href="Cargo.toml">
 </body>
 </html>

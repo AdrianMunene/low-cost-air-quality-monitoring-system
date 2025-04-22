@@ -1,2 +1,4 @@
 /dist/
 /target/
+*.css
+*.css.map
