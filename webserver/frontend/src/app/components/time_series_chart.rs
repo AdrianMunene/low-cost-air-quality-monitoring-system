@@ -4,7 +4,7 @@ use wasm_bindgen::JsCast;
 use plotters_canvas::CanvasBackend;
 use web_sys::{HtmlCanvasElement, window};
 use plotters::prelude::*;
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Utc, Timelike, Datelike};
 use std::ops::Range;
 
 /// A single data point.
@@ -87,13 +87,26 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                 // Use an even darker background color similar to the reference chart
                 root.fill(&RGBColor(15, 15, 25)).unwrap();
 
+                // Reset thread_local variables for x-axis labels
+                thread_local! {
+                    static PREV_HOUR: std::cell::RefCell<Option<i32>> = std::cell::RefCell::new(None);
+                    static PREV_DAY: std::cell::RefCell<Option<i32>> = std::cell::RefCell::new(None);
+                    static PREV_MONTH: std::cell::RefCell<Option<i32>> = std::cell::RefCell::new(None);
+                    static PREV_YEAR: std::cell::RefCell<Option<i32>> = std::cell::RefCell::new(None);
+                }
+
+                PREV_HOUR.with(|h| *h.borrow_mut() = None);
+                PREV_DAY.with(|d| *d.borrow_mut() = None);
+                PREV_MONTH.with(|m| *m.borrow_mut() = None);
+                PREV_YEAR.with(|y| *y.borrow_mut() = None);
+
                 // 3) Build chart with better margins and label areas
                 let mut chart = ChartBuilder::on(&root)
-                    .set_label_area_size(LabelAreaPosition::Left, w / 8) // Larger left margin for y-axis labels
-                    .set_label_area_size(LabelAreaPosition::Bottom, h / 7) // Larger bottom for x-axis labels
+                    .set_label_area_size(LabelAreaPosition::Left, w / 6) // Even larger left margin for y-axis labels
+                    .set_label_area_size(LabelAreaPosition::Bottom, h / 6) // Larger bottom for x-axis labels
                     .set_label_area_size(LabelAreaPosition::Right, 0) // No right margin/labels
                     .set_label_area_size(LabelAreaPosition::Top, 0)   // No top margin/labels
-                    .margin(15) // Larger margin for better spacing
+                    .margin(20) // Larger margin for better spacing
                     .caption(&config.caption, ("sans-serif", (h as f32 * 0.06) as u32).into_font().color(&WHITE))
                     .build_cartesian_2d(
                         config.x_range.clone(),
@@ -104,22 +117,73 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                 chart
                     .configure_mesh()
                     // Use a grid similar to the reference chart
-                    .x_labels(14) // More x-axis labels like in reference
+                    .x_labels(10) // Balanced number of x-axis labels for our smart formatting
                     .y_labels(8) // More y-axis labels
                     .axis_style(WHITE.mix(0.9)) // More visible axes
                     .light_line_style(WHITE.mix(0.15)) // Slightly more visible grid lines
                     .bold_line_style(WHITE.mix(0.25)) // Slightly more visible bold lines
                     .label_style(
-                        ("sans-serif", (h as f32 * 0.07) as u32) // Much larger font for better readability
+                        ("sans-serif", (h as f32 * 0.05) as u32) // Slightly smaller font to avoid clipping
                             .into_font()
                             .color(&WHITE), // Pure white for maximum contrast
                     )
-                    .axis_desc_style(("sans-serif", (h as f32 * 0.07) as u32).into_font().color(&WHITE))
+                    .axis_desc_style(("sans-serif", (h as f32 * 0.06) as u32).into_font().color(&WHITE))
                     .x_desc(&config.x_desc)
                     .y_desc(&config.y_desc)
                     .x_label_formatter(&|dt: &DateTime<Utc>| {
-                        // Format date labels similar to reference chart
-                        dt.format("%d").to_string()
+                        // Smart time formatting logic
+                        // Using the thread_local variables defined at chart level
+
+                        let hour = dt.hour() as i32;
+                        let day = dt.day() as i32;
+                        let month = dt.month() as i32;
+                        let year = dt.year();
+                        let minute = dt.minute();
+
+                        // Format based on changes
+                        let result = PREV_YEAR.with(|prev_year| {
+                            PREV_MONTH.with(|prev_month| {
+                                PREV_DAY.with(|prev_day| {
+                                    PREV_HOUR.with(|prev_hour| {
+                                        let mut prev_hour_val = prev_hour.borrow_mut();
+                                        let mut prev_day_val = prev_day.borrow_mut();
+                                        let mut prev_month_val = prev_month.borrow_mut();
+                                        let mut prev_year_val = prev_year.borrow_mut();
+
+                                        let result = if prev_year_val.is_none() || *prev_year_val != Some(year) {
+                                            // Year changed or first label
+                                            *prev_year_val = Some(year);
+                                            *prev_month_val = Some(month);
+                                            *prev_day_val = Some(day);
+                                            *prev_hour_val = Some(hour);
+                                            format!("{}/{}/{} {:02}:{:02}", year, month, day, hour, minute)
+                                        } else if prev_month_val.is_none() || *prev_month_val != Some(month) {
+                                            // Month changed
+                                            *prev_month_val = Some(month);
+                                            *prev_day_val = Some(day);
+                                            *prev_hour_val = Some(hour);
+                                            format!("{}/{} {:02}:{:02}", month, day, hour, minute)
+                                        } else if prev_day_val.is_none() || *prev_day_val != Some(day) {
+                                            // Day changed
+                                            *prev_day_val = Some(day);
+                                            *prev_hour_val = Some(hour);
+                                            format!("{} {:02}:{:02}", day, hour, minute)
+                                        } else if prev_hour_val.is_none() || *prev_hour_val != Some(hour) {
+                                            // Hour changed
+                                            *prev_hour_val = Some(hour);
+                                            format!("{:02}:{:02}", hour, minute)
+                                        } else {
+                                            // Only minute changed
+                                            format!("{:02}", minute)
+                                        };
+
+                                        result
+                                    })
+                                })
+                            })
+                        });
+
+                        result
                     })
                     .y_label_formatter(&|y| format!("{:.1}", y))
                     .draw()
@@ -161,17 +225,34 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                             PathElement::new(vec![(x, y), (x + 20, y)], &color)
                         });
 
-                    // Add data points for better visibility
-                    if series.data.len() < 50 {
-                        chart
-                            .draw_series(series.data.iter().map(|pt| {
-                                Circle::new(
-                                    (pt.timestamp, pt.value),
-                                    6, // Larger fixed-size points for better visibility
-                                    style.filled(),
-                                )
-                            }))
-                            .unwrap();
+                    // Determine if we should show points based on data density
+                    // Calculate the time span of the data
+                    if !series.data.is_empty() {
+                        let time_span = if series.data.len() > 1 {
+                            let first = series.data.first().unwrap().timestamp;
+                            let last = series.data.last().unwrap().timestamp;
+                            (last - first).num_seconds() as f64
+                        } else {
+                            // Default span if only one point
+                            86400.0 // One day in seconds
+                        };
+
+                        // Calculate average time between points
+                        let avg_time_between_points = time_span / series.data.len() as f64;
+
+                        // Show points if the average time between points is more than 2 hours
+                        // or if there are fewer than 30 points total
+                        if avg_time_between_points > 7200.0 || series.data.len() < 30 {
+                            chart
+                                .draw_series(series.data.iter().map(|pt| {
+                                    Circle::new(
+                                        (pt.timestamp, pt.value),
+                                        6, // Larger fixed-size points for better visibility
+                                        style.filled(),
+                                    )
+                                }))
+                                .unwrap();
+                        }
                     }
                 }
 
