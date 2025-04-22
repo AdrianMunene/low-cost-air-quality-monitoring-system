@@ -4,6 +4,8 @@ use serde::Deserialize;
 #[derive(Deserialize, Clone, PartialEq)]
 pub struct AirQualityData {
     pub timestamp: String,
+    pub longitude: f64,
+    pub latitude: f64,
     pub temperature: Option<f64>,
     pub pressure: Option<f64>,
     pub humidity: Option<f64>,
@@ -26,5 +28,4 @@ pub async fn get_air_quality_data() -> Result<Vec<AirQualityData>, String> {
         }
         Err(e) => Err(format!("Error fetching data: {:?}", e)),
     }
-
 }
