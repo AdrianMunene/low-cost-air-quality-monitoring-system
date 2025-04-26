@@ -1,7 +1,7 @@
 use reqwest::Client;
 use serde::Deserialize;
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, PartialEq)]
 pub struct AirQualityData {
     pub timestamp: String,
     pub temperature: Option<f64>,
@@ -26,4 +26,5 @@ pub async fn get_air_quality_data() -> Result<Vec<AirQualityData>, String> {
         }
         Err(e) => Err(format!("Error fetching data: {:?}", e)),
     }
+
 }

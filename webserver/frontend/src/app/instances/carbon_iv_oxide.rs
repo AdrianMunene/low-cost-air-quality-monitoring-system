@@ -47,9 +47,19 @@ pub fn carbon_iv_oxide_chart() -> Html {
                     // Sort series by timestamp
                     series_co2.sort_by_key(|p| p.timestamp);
 
-                    // Determine the x-axis range
+                    // Determine the x-axis range with better distribution
                     let (x_min, x_max) = if !series_co2.is_empty() {
-                        (series_co2.first().unwrap().timestamp, series_co2.last().unwrap().timestamp)
+                        let first_time = series_co2.first().unwrap().timestamp;
+                        let last_time = series_co2.last().unwrap().timestamp;
+
+                        // Calculate the time span
+                        let time_span = last_time - first_time;
+
+                        // Add 5% padding on both sides to prevent clustering at edges
+                        let padding = time_span.num_seconds() as i64 * 5 / 100;
+                        let padding_duration = chrono::Duration::seconds(padding);
+
+                        (first_time - padding_duration, last_time + padding_duration)
                     } else {
                         (Utc::now(), Utc::now())
                     };
