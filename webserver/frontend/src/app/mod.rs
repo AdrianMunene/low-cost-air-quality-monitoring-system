@@ -1,4 +1,4 @@
-pub mod air_quality_client;
+pub mod utils;
 pub mod components;
 pub mod instances;
 pub mod pages;

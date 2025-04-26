@@ -1,7 +1,7 @@
 use yew::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use chrono::{DateTime, Utc};
-use crate::app::air_quality_client::get_air_quality_data;
+use crate::app::utils::air_quality_client::get_air_quality_data;
 use crate::app::components::time_series_chart::{
     TimeSeriesChart, TimeSeriesChartProps, TimeSeriesChartConfig, ChartSeries, DataPoint,
 };
