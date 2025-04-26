@@ -117,8 +117,8 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                 chart
                     .configure_mesh()
                     // Use a grid similar to the reference chart
-                    .x_labels(10) // Balanced number of x-axis labels for our smart formatting
-                    .y_labels(8) // More y-axis labels
+                    //.x_labels(10) // Balanced number of x-axis labels for our smart formatting
+                    //.y_labels(8) // More y-axis labels
                     .axis_style(WHITE.mix(0.9)) // More visible axes
                     .light_line_style(WHITE.mix(0.15)) // Slightly more visible grid lines
                     .bold_line_style(WHITE.mix(0.25)) // Slightly more visible bold lines
@@ -211,7 +211,7 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                     };
 
                     let style = ShapeStyle::from(&color)
-                        .stroke_width(5); // Even thicker lines for better visibility
+                        .stroke_width(3); // Even thicker lines for better visibility
 
                     // Draw the line series
                     chart
