@@ -6,31 +6,9 @@ use crate::app::instances::carbon_ii_oxide::CarbonIIOxideChart;
 use crate::app::instances::humidity::HumidityChart;
 use crate::app::instances::pressure::PressureChart;
 use crate::app::instances::ozone::OzoneChart;
-use gloo_timers::callback::Interval;
-
-// Minimum time between API requests (in milliseconds)
-const THROTTLE_MS: u32 = 10000; // 10 seconds
 
 #[function_component(Dashboard)]
 pub fn dashboard() -> Html {
-    // Set up a periodic refresh
-    let refresh_counter = use_state(|| 0);
-
-    // Set up an interval to trigger refreshes
-    {
-        let refresh_counter = refresh_counter.clone();
-        use_effect_with((), move |_| {
-            let interval = Interval::new(THROTTLE_MS, move || {
-                refresh_counter.set(*refresh_counter + 1);
-            });
-
-            move || drop(interval)
-        });
-    }
-
-    // Force a re-render when the counter changes
-    let _ = *refresh_counter;
-
     html! {
         <div class="dashboard-wrapper">
             <h2 class="dashboard-title">{ "Air Quality Dashboard" }</h2>

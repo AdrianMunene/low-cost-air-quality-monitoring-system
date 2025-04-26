@@ -435,7 +435,6 @@ name = "frontend"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "gloo-timers 0.3.0",
  "js-sys",
  "log",
  "plotters",

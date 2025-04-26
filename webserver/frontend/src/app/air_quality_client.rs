@@ -1,11 +1,9 @@
 use reqwest::Client;
 use serde::Deserialize;
 
-#[derive(Deserialize, Clone, PartialEq)]
+#[derive(Deserialize, Clone)]
 pub struct AirQualityData {
     pub timestamp: String,
-    pub longitude: f64,
-    pub latitude: f64,
     pub temperature: Option<f64>,
     pub pressure: Option<f64>,
     pub humidity: Option<f64>,
