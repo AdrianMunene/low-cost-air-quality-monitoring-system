@@ -76,7 +76,7 @@ pub fn temperature_chart() -> Html {
                         let chart_series_temp = ChartSeries {
                             label: "Temperature".to_string(),
                             data: series_temp,
-                            color: RED,
+                            color: RGBColor(255, 69, 0),
                         };
 
                         // Build the overall chart configuration

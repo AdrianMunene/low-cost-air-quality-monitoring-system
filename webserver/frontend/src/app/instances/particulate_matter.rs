@@ -102,19 +102,19 @@ pub fn particulate_matter_chart() -> Html {
 
                     // Build chart series.
                     let chart_series_pm1 = ChartSeries {
-                        label: "PM 1.0".to_string(),
+                        label: "PM 1.0µm".to_string(),
                         data: series_pm1,
-                        color: BLUE,
+                        color: RGBColor(50, 142, 110),
                     };
                     let chart_series_pm2 = ChartSeries {
-                        label: "PM 2.5".to_string(),
+                        label: "PM 2.5µm".to_string(),
                         data: series_pm2,
-                        color: GREEN,
+                        color: RGBColor(255, 165, 0),
                     };
                     let chart_series_pm10 = ChartSeries {
-                        label: "PM 10".to_string(),
+                        label: "PM 10µm".to_string(),
                         data: series_pm10,
-                        color: RED,
+                        color: RGBColor(59, 130, 246),
                     };
 
                     // Build the overall chart configuration.

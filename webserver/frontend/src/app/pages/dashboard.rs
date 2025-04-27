@@ -62,7 +62,7 @@ pub fn dashboard() -> Html {
                 // CO2 chart
                 <div class="chart-container chart-medium">
                     <div class="chart-header">
-                        <h3>{ "Carbon Dioxide" }</h3>
+                        <h3>{ "Carbon (IV) Oxide" }</h3>
                         <span class="chart-subtitle">{ "CO₂ (ppm)" }</span>
                     </div>
                     <div class="chart-content">
@@ -73,7 +73,7 @@ pub fn dashboard() -> Html {
                 // CO chart
                 <div class="chart-container chart-medium">
                     <div class="chart-header">
-                        <h3>{ "Carbon Monoxide" }</h3>
+                        <h3>{ "Carbon (II) Oxide" }</h3>
                         <span class="chart-subtitle">{ "CO (ppm)" }</span>
                     </div>
                     <div class="chart-content">

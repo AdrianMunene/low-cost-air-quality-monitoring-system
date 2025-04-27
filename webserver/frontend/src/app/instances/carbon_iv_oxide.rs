@@ -85,15 +85,15 @@ pub fn carbon_iv_oxide_chart() -> Html {
 
                     // Build chart series
                     let chart_series_co2 = ChartSeries {
-                        label: "CO₂".to_string(),
+                        label: "Carbon (IV) Oxide".to_string(),
                         data: series_co2,
-                        color: BLUE,
+                        color: RGBColor(34, 139, 34),
                     };
 
                     // Build the overall chart configuration
                     let config = TimeSeriesChartProps {
                         config: TimeSeriesChartConfig {
-                            caption: "Carbon Dioxide Levels".to_string(),
+                            caption: "Carbon (IV) Oxide Levels".to_string(),
                             x_desc: "Time".to_string(),
                             y_desc: "CO₂ (ppm)".to_string(),
                             x_labels: 10,

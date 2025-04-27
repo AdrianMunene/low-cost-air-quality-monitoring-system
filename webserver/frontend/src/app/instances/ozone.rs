@@ -85,9 +85,9 @@ pub fn ozone_chart() -> Html {
 
                     // Build chart series
                     let chart_series_o3 = ChartSeries {
-                        label: "O₃".to_string(),
+                        label: "Ozone".to_string(),
                         data: series_o3,
-                        color: YELLOW,  // Using YELLOW color for ozone
+                        color: RGBColor(0, 191, 255), 
                     };
 
                     // Build the overall chart configuration

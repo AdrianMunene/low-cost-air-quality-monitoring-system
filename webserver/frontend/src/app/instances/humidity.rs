@@ -87,7 +87,7 @@ pub fn humidity_chart() -> Html {
                     let chart_series_humidity = ChartSeries {
                         label: "Relative Humidity".to_string(),
                         data: series_humidity,
-                        color: CYAN,  // Using CYAN color for humidity
+                        color: BLUE,  
                     };
 
                     // Build the overall chart configuration

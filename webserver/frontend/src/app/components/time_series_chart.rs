@@ -73,7 +73,7 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                 // 1) Handle DPI with higher resolution
                 let dpr = window().unwrap().device_pixel_ratio();
                 // Use a higher scaling factor for better quality
-                let scaling_factor = dpr * 1.5; // Increase resolution by 50%
+                let scaling_factor = dpr * 1.75; // Increase resolution by 50%
                 let w = w as u32;
                 let h = h as u32;
                 canvas.set_width((w as f64 * scaling_factor) as u32);
@@ -123,11 +123,11 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                     .light_line_style(WHITE.mix(0.15)) // Slightly more visible grid lines
                     .bold_line_style(WHITE.mix(0.25)) // Slightly more visible bold lines
                     .label_style(
-                        ("sans-serif", (h as f32 * 0.05) as u32) // Slightly smaller font to avoid clipping
+                        ("sans-serif", (h as f32 * 0.06) as u32) // Slightly smaller font to avoid clipping
                             .into_font()
                             .color(&WHITE), // Pure white for maximum contrast
                     )
-                    .axis_desc_style(("sans-serif", (h as f32 * 0.06) as u32).into_font().color(&WHITE))
+                    .axis_desc_style(("sans-serif", (h as f32 * 0.08) as u32).into_font().color(&WHITE))
                     .x_desc(&config.x_desc)
                     .y_desc(&config.y_desc)
                     .x_label_formatter(&|dt: &DateTime<Utc>| {
@@ -196,19 +196,7 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                         continue;
                     }
 
-                    let color = match series.label.as_str() {
-                        // Use colors similar to the reference chart
-                        "PM 1.0" => RGBColor(59, 130, 246),  // Blue
-                        "PM 2.5" => RGBColor(255, 165, 0),   // Orange like in reference
-                        "PM 10"  => RGBColor(239, 68, 68),   // Red
-                        "Temperature" => RGBColor(244, 63, 94), // Red
-                        "Humidity"    => RGBColor(16, 185, 129), // Green
-                        "Pressure"    => RGBColor(139, 92, 246), // Purple
-                        "CO₂"         => RGBColor(255, 165, 0),  // Orange like in reference
-                        "CO"          => RGBColor(244, 63, 94),  // Red
-                        "O₃"          => RGBColor(59, 130, 246), // Blue
-                        _ => series.color.clone(),
-                    };
+                    let color = series.color.clone();
 
                     let style = ShapeStyle::from(&color)
                         .stroke_width(3); // Even thicker lines for better visibility
@@ -222,7 +210,7 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                         .unwrap()
                         .label(&series.label)
                         .legend(move |(x, y)| {
-                            PathElement::new(vec![(x, y), (x + 20, y)], &color)
+                            PathElement::new(vec![(x, y), (x + 50, y)], &color)
                         });
 
                     // Determine if we should show points based on data density
@@ -247,7 +235,7 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                                 .draw_series(series.data.iter().map(|pt| {
                                     Circle::new(
                                         (pt.timestamp, pt.value),
-                                        6, // Larger fixed-size points for better visibility
+                                        1, // Larger fixed-size points for better visibility
                                         style.filled(),
                                     )
                                 }))
@@ -259,15 +247,16 @@ pub fn time_series_chart(props: &TimeSeriesChartProps) -> Html {
                 // 5) Legend - similar to reference chart
                 chart
                     .configure_series_labels()
-                    .background_style(&RGBColor(30, 30, 40).mix(0.9)) // Slightly transparent background
-                    .border_style(&WHITE.mix(0.3)) // Subtle border
+                    .legend_area_size(w / 12) // Even larger legend area for better visibility
+                    .background_style(&RGBColor(30, 30, 40).mix(0.8)) // Slightly transparent background
+                    .border_style(&WHITE.mix(0.5)) // Subtle border
                     .label_font(
-                        ("sans-serif", (h as f32 * 0.055) as u32) // Larger font for legend
+                        ("sans-serif", (h as f32 * 0.06) as u32) // Larger font for legend
                             .into_font()
                             .color(&WHITE), // Pure white for maximum contrast
                     )
-                    .position(SeriesLabelPosition::UpperLeft) // Position in upper left to avoid right side
-                    .margin(15) // Larger margin
+                    .position(SeriesLabelPosition::UpperRight) // Position in upper left to avoid right side
+                    .margin(10) // Larger margin
                     .draw()
                     .unwrap();
             }) as Box<dyn FnMut()>);
