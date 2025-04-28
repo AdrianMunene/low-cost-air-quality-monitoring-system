@@ -104,7 +104,7 @@ pub fn particulate_matter_chart() -> Html {
                     let chart_series_pm1 = ChartSeries {
                         label: "PM 1.0µm".to_string(),
                         data: series_pm1,
-                        color: RGBColor(50, 142, 110),
+                        color: RGBColor(0, 128, 128),
                     };
                     let chart_series_pm2 = ChartSeries {
                         label: "PM 2.5µm".to_string(),
