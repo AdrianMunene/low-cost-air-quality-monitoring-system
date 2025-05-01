@@ -1,10 +1,10 @@
 use yew::prelude::*;
 use crate::app::instances::particulate_matter::ParticulateMatterChart;
 use crate::app::instances::temperature::TemperatureChart;
+use crate::app::instances::pressure::PressureChart;
+use crate::app::instances::humidity::HumidityChart;
 use crate::app::instances::carbon_iv_oxide::CarbonIVOxideChart;
 use crate::app::instances::carbon_ii_oxide::CarbonIIOxideChart;
-use crate::app::instances::humidity::HumidityChart;
-use crate::app::instances::pressure::PressureChart;
 use crate::app::instances::ozone::OzoneChart;
 
 #[function_component(Dashboard)]
@@ -26,6 +26,7 @@ pub fn dashboard() -> Html {
                     </div>
                 </div>
 
+                
                 // Temperature chart
                 <div class="chart-container chart-medium">
                     <div class="chart-header">
@@ -36,7 +37,7 @@ pub fn dashboard() -> Html {
                         <TemperatureChart />
                     </div>
                 </div>
-
+                
                 // Humidity chart
                 <div class="chart-container chart-medium">
                     <div class="chart-header">
@@ -47,7 +48,7 @@ pub fn dashboard() -> Html {
                         <HumidityChart />
                     </div>
                 </div>
-
+                
                 // Pressure chart
                 <div class="chart-container chart-medium">
                     <div class="chart-header">
@@ -58,7 +59,7 @@ pub fn dashboard() -> Html {
                         <PressureChart />
                     </div>
                 </div>
-
+                
                 // CO2 chart
                 <div class="chart-container chart-medium">
                     <div class="chart-header">
