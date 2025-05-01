@@ -121,7 +121,7 @@ impl Component for TimeSeriesChart {
                         .set_label_area_size(LabelAreaPosition::Bottom, height / 6)
                         .set_label_area_size(LabelAreaPosition::Right, 0)
                         .set_label_area_size(LabelAreaPosition::Top, 0)
-                        .caption(&config.caption, ("sans-serif", (height as f32 * 0.06) as u32).into_font().color(&WHITE))
+                        .caption(&config.caption, ("sans-serif", (height as f32 * 0.08) as u32).into_font().color(&WHITE))
                         .build_cartesian_2d(config.x_range.clone(), config.y_range.clone())
                         .unwrap();
 
