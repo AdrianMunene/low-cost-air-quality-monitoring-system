@@ -3,7 +3,7 @@ use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 
-use backend::security::ensure_certs_dir;
+use backend::security::certificates::ensure_certs_dir;
 
 fn main() {
     println!("Generating self-signed certificates for HTTPS...");

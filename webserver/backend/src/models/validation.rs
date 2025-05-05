@@ -1,5 +1,5 @@
-use crate::dto::AirQualityInputOutput;
 use chrono::NaiveDateTime;
+use crate::models::air_quality::AirQualityInputOutput;
 
 pub fn validate_air_quality_data(data: &AirQualityInputOutput) -> Result<(), String> {
     // Validate timestamp format

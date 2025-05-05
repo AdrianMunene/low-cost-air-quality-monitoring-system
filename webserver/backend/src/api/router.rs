@@ -7,7 +7,7 @@ use axum::{
 use tower_http::cors::{CorsLayer, Any};
 use tower_http::trace::TraceLayer;
 
-use crate::db::DatabasePool;
+use crate::database::connection::DatabasePool;
 use crate::middleware::api_key::api_key_auth;
 use crate::api::air_quality::{create_air_quality_record, get_air_quality_record};
 

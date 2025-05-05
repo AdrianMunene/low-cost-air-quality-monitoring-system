@@ -3,11 +3,12 @@ use axum_server::tls_rustls::RustlsConfig;
 use tracing::{info, error};
 use tracing_subscriber::EnvFilter;
 
-use backend::config::{AppConfig, ServerConfig};
-use backend::db::establish_connection_pool;
-use backend::api::create_router;
+use backend::config::app_config::AppConfig;
+use backend::config::server_config::ServerConfig;
+use backend::database::connection::establish_connection_pool;
+use backend::api::router::create_router;
 use backend::middleware::rate_limit::{RateLimiter, rate_limit};
-use backend::security::{ensure_certs_dir, certs_exist, get_cert_paths};
+use backend::security::certificates::{ensure_certs_dir, certs_exist, get_cert_paths};
 
 #[tokio::main]
 async fn main() {

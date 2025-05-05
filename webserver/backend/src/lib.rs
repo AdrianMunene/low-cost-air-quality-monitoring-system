@@ -1,9 +1,8 @@
 // Re-export modules
 pub mod api;
 pub mod config;
-pub mod db;
-pub mod dto;
+pub mod database;
+pub mod models;
 pub mod error;
 pub mod middleware;
 pub mod security;
-pub mod utils;

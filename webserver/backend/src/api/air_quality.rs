@@ -4,10 +4,10 @@ use diesel::prelude::*;
 use serde_json::json;
 use tracing::info;
 
-use crate::db::DatabasePool;
-use crate::dto::AirQualityInputOutput;
-use crate::error::ApiError;
-use crate::utils::validate_air_quality_data;
+use crate::database::connection::DatabasePool;
+use crate::models::air_quality::AirQualityInputOutput;
+use crate::error::api_error::ApiError;
+use crate::models::validation::validate_air_quality_data;
 use database::models::{AirQualityData, NewAirQualityData};
 use database::schema::air_quality_data::dsl::air_quality_data;
 
