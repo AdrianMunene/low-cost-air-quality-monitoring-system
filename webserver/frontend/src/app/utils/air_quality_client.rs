@@ -39,8 +39,8 @@ async fn try_get_data(use_https: bool) -> Result<Vec<AirQualityData>, String> {
 
     // Try different endpoints - prioritize localhost for better name resolution
     let endpoints = [
-        format!("{}://localhost:3001/airquality", protocol),
-        format!("{}://127.0.0.1:3001/airquality", protocol),
+        format!("{}://localhost:3000/airquality", protocol),
+        format!("{}://127.0.0.1:3000/airquality", protocol),
     ];
 
     for url in endpoints.iter() {
