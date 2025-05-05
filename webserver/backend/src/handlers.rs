@@ -6,6 +6,7 @@ use diesel::prelude::*;
 use database::models::{AirQualityData, NewAirQualityData};
 use database::schema::air_quality_data::dsl::air_quality_data;
 use crate::database::DatabasePool;
+use tracing::info;
 
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -26,7 +27,7 @@ pub struct AirQualityInputOutput {
 }
 
 pub async fn create_air_quality_record(
-    Extension(pool): Extension<DatabasePool>, 
+    Extension(pool): Extension<DatabasePool>,
     Json(input): Json<AirQualityInputOutput>,
 ) -> Result<Json<serde_json::Value>, String> {
 
@@ -61,10 +62,23 @@ pub async fn create_air_quality_record(
 pub async fn get_air_quality_record(
     Extension(pool): Extension<DatabasePool>
 ) -> Result<Json<Vec<AirQualityInputOutput>>, String> {
-    
-    let mut conn = pool.get().map_err(|e| e.to_string())?;
+    info!("Received request for air quality data");
 
-    let records = air_quality_data.load::<AirQualityData>(&mut conn).map_err(|e| e.to_string())?;
+    let mut conn = pool.get().map_err(|e| {
+        info!("Database connection error: {}", e);
+        e.to_string()
+    })?;
+
+    let records = match air_quality_data.load::<AirQualityData>(&mut conn) {
+        Ok(data) => {
+            info!("Successfully loaded {} air quality records", data.len());
+            data
+        },
+        Err(e) => {
+            info!("Error loading air quality data: {}", e);
+            return Err(e.to_string());
+        }
+    };
 
     let output: Vec<AirQualityInputOutput> = records.into_iter().map(|record| {
         AirQualityInputOutput {

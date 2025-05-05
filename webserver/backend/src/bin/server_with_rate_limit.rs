@@ -1,16 +1,12 @@
-use axum::{ http::{self, Method}, routing::{ get, post }, Router, Extension };
 use dotenvy::dotenv;
-use tower_http::cors::{ CorsLayer, Any };
-use axum_server::tls_rustls::RustlsConfig;
+use std::sync::Arc;
 use tracing::{info, error};
-use tracing_subscriber::EnvFilter;
+use axum_server::tls_rustls::RustlsConfig;
 
-use database::establish_connection_pool;
-use handlers::{create_air_quality_record, get_air_quality_record};
-
-mod database;
-mod handlers;
-mod certificates;
+use backend::database::establish_connection_pool;
+use backend::create_app;
+use backend::middleware::rate_limit::{RateLimiter, rate_limit};
+use backend::certificates;
 
 #[tokio::main]
 async fn main() {
@@ -18,36 +14,26 @@ async fn main() {
     dotenv().ok();
 
     // Initialize tracing
-    let env_filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("info,tower_http=debug,axum=debug"));
-
     tracing_subscriber::fmt()
-        .with_env_filter(env_filter)
+        .with_env_filter(std::env::var("RUST_LOG").unwrap_or_else(|_| "info".to_string()))
         .init();
-
-    info!("Starting HTTPS server...");
 
     // Set up database connection pool
     let pool = establish_connection_pool();
 
-    // Set up CORS - Allow all origins for development
-    let cors = CorsLayer::new()
-        .allow_methods(vec![Method::GET, Method::POST, Method::OPTIONS])
-        .allow_headers([
-            http::header::CONTENT_TYPE,
-            http::header::ACCEPT,
-            http::header::ORIGIN,
-            http::header::HeaderName::from_static("x-api-key"),
-        ])
-        .allow_origin(Any)
-        .allow_credentials(false);
+    // Create rate limiter (10 requests per minute)
+    let rate_limiter = Arc::new(RateLimiter::new(10, 60));
 
     // Create the application with all routes and middleware
-    let app = Router::new()
-        .route("/airquality", get(get_air_quality_record))
-        .route("/airquality", post(create_air_quality_record))
-        .layer(cors)
-        .layer(Extension(pool));
+    let app = create_app(pool);
+
+    // Add rate limiting middleware
+    let app = app
+        .layer(axum::middleware::from_fn_with_state(
+            rate_limiter.clone(),
+            rate_limit,
+        ))
+        .with_state(rate_limiter);
 
     // Ensure certificates directory exists
     certificates::ensure_certs_dir();
@@ -81,18 +67,25 @@ async fn main() {
     let use_https = std::env::var("USE_HTTPS").unwrap_or_else(|_| "false".to_string()) == "true";
 
     if use_https {
-        info!("HTTPS server listening on https://{}", addr);
+        info!("HTTPS server with rate limiting listening on https://{}", addr);
 
         // Start the HTTPS server
-        axum_server::bind_rustls(addr.parse().unwrap(), config)
+        if let Err(e) = axum_server::bind_rustls(addr.parse().unwrap(), config)
             .serve(app.into_make_service())
-            .await
-            .unwrap();
+            .await {
+            error!("HTTPS server error: {}", e);
+            eprintln!("HTTPS server error: {}", e);
+            std::process::exit(1);
+        }
     } else {
-        info!("HTTP server listening on http://{}", addr);
+        info!("HTTP server with rate limiting listening on http://{}", addr);
 
         // Start the HTTP server
         let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
-        axum::serve(listener, app).await.unwrap();
+        if let Err(e) = axum::serve(listener, app).await {
+            error!("HTTP server error: {}", e);
+            eprintln!("HTTP server error: {}", e);
+            std::process::exit(1);
+        }
     }
 }
