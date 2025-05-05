@@ -8,9 +8,9 @@ use backend::security::certificates::ensure_certs_dir;
 fn main() {
     println!("Generating self-signed certificates for HTTPS...");
 
-    // Create certs directory if it doesn't exist
+    // Create certificates directory if it doesn't exist
     ensure_certs_dir();
-    let certs_dir = Path::new("certs");
+    let certificates_dir = Path::new("certificates");
 
     // Generate OpenSSL configuration file
     let openssl_config = r#"
@@ -37,12 +37,12 @@ DNS.1 = localhost
 IP.1 = 127.0.0.1
     "#;
 
-    let config_path = certs_dir.join("openssl.cnf");
+    let config_path = certificates_dir.join("openssl.cnf");
     let mut config_file = File::create(&config_path).expect("Failed to create OpenSSL config file");
     config_file.write_all(openssl_config.as_bytes()).expect("Failed to write OpenSSL config");
 
     // Generate private key
-    let key_path = certs_dir.join("key.pem");
+    let key_path = certificates_dir.join("key.pem");
     let status = Command::new("openssl")
         .args(["genrsa", "-out"])
         .arg(&key_path)
@@ -55,7 +55,7 @@ IP.1 = 127.0.0.1
     }
 
     // Generate certificate
-    let cert_path = certs_dir.join("cert.pem");
+    let cert_path = certificates_dir.join("cert.pem");
     let status = Command::new("openssl")
         .args(["req", "-new", "-x509", "-key"])
         .arg(&key_path)

@@ -8,5 +8,5 @@ open = false
 # Disable auto-reload of the web app
 no_autoreload = false
 # Enable HTTPS
-tls_key_path = "../backend/certs/key.pem"
-tls_cert_path = "../backend/certs/cert.pem"
+tls_key_path = "../backend/certificates/key.pem"
+tls_cert_path = "../backend/certificates/cert.pem"

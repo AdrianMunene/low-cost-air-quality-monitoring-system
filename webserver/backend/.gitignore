@@ -1,2 +1,20 @@
 /target/
+*.pdb
+**/*.rs.bk
+
+# Database files
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# HTTPS certificates
+/certificates/*.pem
+/certificates/openssl.cnf
+
+# Keep curl_scripts directory
 /curl_scripts/
+
+# IDE files
+.idea/
+.vscode/

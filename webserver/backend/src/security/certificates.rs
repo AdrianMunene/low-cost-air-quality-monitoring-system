@@ -41,17 +41,17 @@ pub fn load_private_key(key_path: &Path) -> PrivateKeyDer<'static> {
 /// Returns the paths to the certificate and key files
 pub fn get_cert_paths() -> (PathBuf, PathBuf) {
     // Check environment variables first
-    let cert_path = env::var("CERT_PATH").unwrap_or_else(|_| "certs/cert.pem".to_string());
-    let key_path = env::var("KEY_PATH").unwrap_or_else(|_| "certs/key.pem".to_string());
+    let cert_path = env::var("CERT_PATH").unwrap_or_else(|_| "certificates/cert.pem".to_string());
+    let key_path = env::var("KEY_PATH").unwrap_or_else(|_| "certificates/key.pem".to_string());
 
     (PathBuf::from(cert_path), PathBuf::from(key_path))
 }
 
 /// Ensures the certificates directory exists
 pub fn ensure_certs_dir() {
-    let certs_dir = PathBuf::from("certs");
-    if !certs_dir.exists() {
-        fs::create_dir_all(&certs_dir).expect("Failed to create certificates directory");
+    let certificates_dir = PathBuf::from("certificates");
+    if !certificates_dir.exists() {
+        fs::create_dir_all(&certificates_dir).expect("Failed to create certificates directory");
     }
 }
 

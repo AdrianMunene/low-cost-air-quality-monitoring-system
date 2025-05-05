@@ -1,5 +1,14 @@
 /target/
+*.pdb
+**/*.rs.bk
+
+# Database files
 *.db
 *.db-journal
 *.db-wal
 *.db-shm
+/data/
+
+# IDE files
+.idea/
+.vscode/
