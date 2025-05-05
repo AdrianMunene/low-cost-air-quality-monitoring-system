@@ -1,6 +1,5 @@
 use axum::{
     extract::{Request, ConnectInfo},
-    http::StatusCode,
     middleware::Next,
     response::Response,
 };
@@ -8,6 +7,8 @@ use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
+
+use crate::error::ApiError;
 
 // Simple in-memory rate limiter
 pub struct RateLimiter {
@@ -59,11 +60,11 @@ pub async fn rate_limit(
     limiter: axum::extract::State<Arc<RateLimiter>>,
     request: Request,
     next: Next,
-) -> Result<Response, StatusCode> {
+) -> Result<Response, ApiError> {
     let ip = addr.ip().to_string();
 
     if limiter.is_rate_limited(&ip) {
-        return Err(StatusCode::TOO_MANY_REQUESTS);
+        return Err(ApiError::TooManyRequests);
     }
 
     Ok(next.run(request).await)

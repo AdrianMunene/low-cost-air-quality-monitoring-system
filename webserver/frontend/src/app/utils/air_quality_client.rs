@@ -1,4 +1,4 @@
-use reqwest::Client;
+use reqwest::{Client, ClientBuilder};
 use serde::Deserialize;
 
 #[derive(Deserialize, Clone, PartialEq)]
@@ -17,41 +17,63 @@ pub struct AirQualityData {
 
 // Try both HTTPS and HTTP endpoints
 pub async fn get_air_quality_data() -> Result<Vec<AirQualityData>, String> {
-    // First try HTTPS
+    // Try HTTPS first as it's the preferred method
     match try_get_data(true).await {
         Ok(data) => Ok(data),
         Err(https_err) => {
-            log::warn!("HTTPS request failed: {}. Trying HTTP...", https_err);
-            // If HTTPS fails, try HTTP
+            log::warn!("HTTPS request failed: {}. Trying HTTP as fallback...", https_err);
+            // If HTTPS fails, try HTTP as fallback
             try_get_data(false).await
         }
     }
 }
 
 async fn try_get_data(use_https: bool) -> Result<Vec<AirQualityData>, String> {
-    // Build standard client - reqwest in WASM automatically accepts invalid certs
-    let client = Client::new();
+    // Build client with more permissive settings for development
+    let client = ClientBuilder::new()
+        .build()
+        .unwrap_or_else(|_| Client::new());
 
-    // Determine protocol
+    // Determine protocol and port
     let protocol = if use_https { "https" } else { "http" };
-    let url = format!("{}://127.0.0.1:3001/airquality", protocol);
 
-    log::info!("Attempting to fetch data from: {}", url);
+    // Try different endpoints - prioritize localhost for better name resolution
+    let endpoints = [
+        format!("{}://localhost:3001/airquality", protocol),
+        format!("{}://127.0.0.1:3001/airquality", protocol),
+    ];
 
-    match client.get(&url)
-        .header("Accept", "application/json")
-        .header("Content-Type", "application/json")
-        .send().await {
-        Ok(response) => {
-            if !response.status().is_success() {
-                return Err(format!("Server returned error status: {}", response.status()));
+    for url in endpoints.iter() {
+        log::info!("Attempting to fetch data from: {}", url);
+
+        match client.get(url)
+            .header("Accept", "application/json")
+            .send().await {
+            Ok(response) => {
+                log::info!("Received response with status: {}", response.status());
+
+                if !response.status().is_success() {
+                    log::warn!("Server returned error status: {}", response.status());
+                    continue;
+                }
+
+                match response.json::<Vec<AirQualityData>>().await {
+                    Ok(data) => {
+                        log::info!("Successfully parsed response data with {} records", data.len());
+                        return Ok(data);
+                    },
+                    Err(e) => {
+                        log::error!("Failed to parse response: {:?}", e);
+                        continue;
+                    }
+                }
             }
-
-            match response.json::<Vec<AirQualityData>>().await {
-                Ok(data) => Ok(data),
-                Err(e) => Err(format!("Failed to parse response: {:?}", e))
+            Err(e) => {
+                log::error!("Error fetching data from {}: {:?}", url, e);
+                continue;
             }
         }
-        Err(e) => Err(format!("Error fetching data from {}: {:?}", url, e)),
     }
+
+    Err("Failed to fetch data from any endpoint".to_string())
 }

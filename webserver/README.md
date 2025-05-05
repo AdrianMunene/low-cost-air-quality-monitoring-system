@@ -38,26 +38,27 @@ This is a complete air quality monitoring system with a secure HTTPS backend and
 3. Create a `.env` file in the backend directory with the following content:
    ```
    DATABASE_URL=../database/air_quality.db
-   HOST=127.0.0.1
+   HOST=0.0.0.0
    PORT=3001
    API_KEY=your_secure_api_key_here
    RUST_LOG=info
-   USE_HTTPS=false  # Set to true for HTTPS mode
+   USE_HTTPS=true  # Default is HTTPS mode
+   RATE_LIMIT_PER_MINUTE=60  # Adjust as needed
    ```
 
-4. Run the backend server:
+4. Run the backend server (HTTPS is enabled by default):
    ```
-   cargo run --bin backend
-   ```
-
-   Or with rate limiting:
-   ```
-   cargo run --bin server_with_rate_limit
+   cargo run
    ```
 
-   To run with HTTPS enabled:
+   To run with HTTP instead (not recommended):
    ```
-   USE_HTTPS=true cargo run --bin backend
+   USE_HTTPS=false cargo run
+   ```
+
+   To adjust rate limiting:
+   ```
+   RATE_LIMIT_PER_MINUTE=120 cargo run
    ```
 
    When using HTTPS, you'll need to accept the self-signed certificate warnings in your browser.

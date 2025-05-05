@@ -25,9 +25,11 @@ This is the backend server for the Air Quality Monitoring System. It provides AP
 
 ### Rate Limiting
 
-To run the server with rate limiting (10 requests per minute):
+The server includes built-in rate limiting to prevent abuse. By default, it's set to 60 requests per minute.
+You can configure the rate limit using the `RATE_LIMIT_PER_MINUTE` environment variable:
+
 ```
-cargo run --bin server_with_rate_limit
+RATE_LIMIT_PER_MINUTE=120 cargo run
 ```
 
 ## Environment Variables
@@ -36,8 +38,10 @@ The following environment variables can be configured in the `.env` file:
 
 - `DATABASE_URL`: Path to the SQLite database file
 - `HOST`: Host address to bind the server to (default: 0.0.0.0)
-- `PORT`: Port to listen on (default: 3000)
+- `PORT`: Port to listen on (default: 3001)
 - `API_KEY`: Secret key for authenticating API requests
+- `USE_HTTPS`: Whether to use HTTPS (default: true)
+- `RATE_LIMIT_PER_MINUTE`: Number of requests allowed per minute per IP (default: 60)
 - `RUST_LOG`: Logging level configuration (default: info,tower_http=debug,axum=debug)
 
 

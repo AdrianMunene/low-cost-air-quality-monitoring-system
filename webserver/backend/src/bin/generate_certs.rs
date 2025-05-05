@@ -1,16 +1,16 @@
-use std::fs::{self, File};
+use std::fs::File;
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
+
+use backend::security::ensure_certs_dir;
 
 fn main() {
     println!("Generating self-signed certificates for HTTPS...");
 
     // Create certs directory if it doesn't exist
+    ensure_certs_dir();
     let certs_dir = Path::new("certs");
-    if !certs_dir.exists() {
-        fs::create_dir_all(certs_dir).expect("Failed to create certs directory");
-    }
 
     // Generate OpenSSL configuration file
     let openssl_config = r#"

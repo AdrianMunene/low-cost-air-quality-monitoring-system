@@ -1,4 +1,4 @@
-use crate::handlers::AirQualityInputOutput;
+use crate::dto::AirQualityInputOutput;
 use chrono::NaiveDateTime;
 
 pub fn validate_air_quality_data(data: &AirQualityInputOutput) -> Result<(), String> {
