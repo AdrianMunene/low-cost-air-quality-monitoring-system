@@ -2,7 +2,6 @@
 name = "backend"
 version = "0.1.0"
 edition = "2024"
-default-run = "backend"
 
 [dependencies]
 axum = "0.8.3"
@@ -15,13 +14,7 @@ chrono = "0.4.40"
 r2d2 = "0.8.10"
 r2d2-diesel = "1.0.0"
 database = { path = "../database" }
-tower-http = { version = "0.6.2", features = ["cors", "trace"] }
-rustls = "0.23.25"
-rustls-pemfile = "2.2.0"
-tokio-rustls = "0.26.2"
-axum-server = { version = "0.6.0", features = ["tls-rustls"] }
-tracing = "0.1.40"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tower-http = { version = "0.6.2", features = ["cors"] }
 
 [dev-dependencies]
 reqwest = { version = "0.12.15", features = ["json"] }
