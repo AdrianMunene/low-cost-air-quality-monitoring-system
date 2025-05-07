@@ -156,20 +156,18 @@ pub fn time_filter(props: &TimeFilterProps) -> Html {
     html! {
         <div class="time-filter">
             <div class="time-filter-row">
-                <label for="time-range">{"Time Range: "}</label>
-                <select id="time-range" value={selected_value} onchange={on_select}>
+                <label for="time-range" class="time-range-label">{"Time Range:"}</label>
+                <select id="time-range" value={selected_value} onchange={on_select} class="time-range-select">
                     <option value="today">{"Today"}</option>
                     <option value="yesterday">{"Yesterday"}</option>
                     <option value="last_week">{"Last 7 Days"}</option>
                     <option value="last_month">{"Last 30 Days"}</option>
                     <option value="custom">{"Custom Range"}</option>
                 </select>
-            </div>
 
-            if *show_custom_dates {
-                <div class="time-filter-custom">
-                    <div class="time-filter-row">
-                        <label for="start-date">{"Start Date: "}</label>
+                if *show_custom_dates {
+                    <>
+                        <label for="start-date">{"Start Date:"}</label>
                         <input
                             type="date"
                             id="start-date"
@@ -177,7 +175,7 @@ pub fn time_filter(props: &TimeFilterProps) -> Html {
                             onchange={on_start_date_change}
                         />
 
-                        <label for="end-date">{"End Date: "}</label>
+                        <label for="end-date">{"End Date:"}</label>
                         <input
                             type="date"
                             id="end-date"
@@ -186,9 +184,9 @@ pub fn time_filter(props: &TimeFilterProps) -> Html {
                         />
 
                         <button onclick={on_apply_custom_range}>{"Apply"}</button>
-                    </div>
-                </div>
-            }
+                    </>
+                }
+            </div>
         </div>
     }
 }

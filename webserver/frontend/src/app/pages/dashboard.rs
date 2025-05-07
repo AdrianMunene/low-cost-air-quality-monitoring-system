@@ -27,7 +27,6 @@ pub fn dashboard() -> Html {
         <div class="dashboard-wrapper">
             // Time filter component
             <div class="dashboard-controls">
-                <span class="time-range-label">{"Time Range:"}</span>
                 <TimeFilterComponent
                     selected_range={(*selected_time_range).clone()}
                     on_range_change={on_time_range_change.clone()}

@@ -19,6 +19,14 @@ impl TimeLabelState {
     }
 }
 
+/// Reset the thread-local state to ensure the next call to smart_time_label
+/// will show the full date format
+pub fn reset_time_label_state() {
+    PREV.with(|cell| {
+        *cell.borrow_mut() = TimeLabelState::new();
+    });
+}
+
 /// Given a DateTime<Utc>, only show the largest unit that has changed:
 ///   * On year change, show `YYYY/MM/DD HH:MM`
 ///   * On month change, show `MM/DD HH:MM`

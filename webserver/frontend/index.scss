@@ -68,19 +68,15 @@ body {
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: var(--header-bg); /* Match header background color */
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 4px var(--shadow-color);
-
-    .time-range-label {
-        margin-right: 0.75rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        color: var(--text-color);
-        white-space: nowrap;
-    }
+    margin-bottom: 0.75rem;
+    padding: 0.5rem 0.75rem; /* Slightly increased padding for better spacing */
+    background-color: var(--card-bg); /* Match chart container background color */
+    border-radius: 0.5rem; /* Match chart container border-radius */
+    box-shadow: 0 4px 8px var(--shadow-color); /* Match chart container shadow */
+    min-height: 40px; /* Increased height to accommodate all elements */
+    width: 100%; /* Make it full width like the chart containers */
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Match chart container border */
 }
 
 /* Main chart grid - 2x2 layout */
@@ -118,7 +114,7 @@ body {
     /* Large chart (PM chart at top) */
     &.chart-large {
         height: 500px;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem; /* Reduced from 1.5rem to reduce space between charts */
     }
 
     /* Medium charts (2x2 grid) */
@@ -129,23 +125,24 @@ body {
 
 /* Chart Header */
 .chart-header {
-    padding: 1rem 1.25rem;
+    padding: 0.5rem 0.75rem; /* Reduced padding for smaller size */
     background-color: var(--chart-header-bg);
     border-bottom: 1px solid var(--border-color);
     z-index: 2;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    min-height: 28px; /* Set a smaller specific height */
 
     h3 {
         margin: 0;
-        font-size: 1rem;
-        font-weight: 600;
+        font-size: 0.85rem; /* Smaller font size */
+        font-weight: 500; /* Less bold */
         color: var(--text-color);
     }
 
     .chart-subtitle {
-        font-size: 0.875rem;
+        font-size: 0.75rem; /* Smaller font size */
         color: var(--text-secondary);
         margin-left: auto;
     }
@@ -346,18 +343,46 @@ canvas {
 .time-filter {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.5rem;
+    padding: 0.25rem;
     color: var(--text-color);
+    width: 100%;
 
     .time-filter-row {
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        flex-wrap: nowrap; /* Prevent wrapping */
+        justify-content: flex-end; /* Align to the right */
 
         label {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             white-space: nowrap;
+            margin: 0;
+        }
+
+        .time-range-label {
+            font-weight: 600; /* Bold the label */
+            font-size: 0.85rem; /* Slightly smaller font */
+            color: var(--text-color);
+            white-space: nowrap;
+            margin-right: 0.5rem;
+        }
+
+        .time-range-select {
+            min-width: 140px;
+            background-color: var(--chart-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.85rem;
+            border-radius: 0.25rem;
+            margin-right: 1rem; /* Increased spacing */
+
+            option {
+                color: var(--text-color);
+                background-color: var(--chart-bg);
+                font-weight: normal;
+            }
         }
 
         select, input {
@@ -366,7 +391,9 @@ canvas {
             border: 1px solid var(--border-color);
             border-radius: 0.25rem;
             padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
+            width: auto;
+            min-width: 110px; /* Slightly smaller */
 
             &:focus {
                 outline: none;
@@ -380,18 +407,17 @@ canvas {
             border: none;
             border-radius: 0.25rem;
             padding: 0.25rem 0.75rem;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             cursor: pointer;
             transition: background-color 0.2s;
+            white-space: nowrap;
+            margin-left: 0.5rem; /* Increased spacing */
+            min-width: 70px; /* Ensure consistent width */
 
             &:hover {
                 background-color: darken(#f59e0b, 10%);
             }
         }
-    }
-
-    .time-filter-custom {
-        margin-top: 0.5rem;
     }
 }
 
@@ -482,27 +508,33 @@ canvas {
 
         .time-filter-row {
             flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 0.5rem;
 
             label {
-                min-width: 80px;
+                min-width: auto;
             }
 
-            select, input {
-                flex: 1;
-            }
-        }
-
-        .time-filter-custom .time-filter-row {
-            flex-direction: column;
-            align-items: flex-start;
-
-            input {
+            .time-range-label {
                 width: 100%;
                 margin-bottom: 0.5rem;
             }
 
+            .time-range-select {
+                width: 100%;
+                margin-bottom: 0.5rem;
+                margin-right: 0;
+            }
+
+            select, input {
+                width: 100%;
+                min-width: auto;
+                margin-bottom: 0.5rem;
+            }
+
             button {
-                align-self: flex-end;
+                width: 100%;
+                margin-left: 0;
             }
         }
     }
@@ -521,14 +553,14 @@ canvas {
     }
 
     .chart-header {
-        padding: 0.75rem 1rem;
+        padding: 0.4rem 0.6rem;
 
         h3 {
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
 
         .chart-subtitle {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
     }
 }

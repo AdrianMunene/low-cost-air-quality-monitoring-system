@@ -7,7 +7,7 @@ use plotters::prelude::*;
 use chrono::{ DateTime, Utc };
 use std::ops::Range;
 use std::rc::Rc;
-use crate::app::utils::time_formatter::smart_time_label;
+use crate::app::utils::time_formatter::{smart_time_label, reset_time_label_state};
 
 /// A single data point.
 #[derive(Clone, PartialEq)]
@@ -46,7 +46,7 @@ pub enum Msg {
     Redraw,
 }
 
-pub struct TimeSeriesChart { 
+pub struct TimeSeriesChart {
     props: TimeSeriesChartProps,
     canvas_ref: NodeRef,
     raf_closure: Option<Closure<dyn FnMut()>>,
@@ -94,6 +94,10 @@ impl Component for TimeSeriesChart {
                     let canvas_clone = canvas.clone();
                     let config_rc = Rc::clone(&self.props.config);
 
+                    // Reset the time label state before rendering the chart
+                    // This ensures the first label will show the full date format
+                    reset_time_label_state();
+
                     let draw_canvas_backend = Closure::wrap(Box::new(move || {
                         let width = canvas_clone.client_width() as u32;
                         let height = canvas_clone.client_height() as u32;
@@ -103,11 +107,11 @@ impl Component for TimeSeriesChart {
                         let device_pixel_ratio = window().unwrap().device_pixel_ratio();
 
                         let canvas_clone = canvas_clone.clone();
-                        
+
                         let scaling_factor = 1.7;
 
                         canvas_clone.set_width((width as f64 * device_pixel_ratio * scaling_factor) as u32);
-                        canvas_clone.set_height((height as f64 * device_pixel_ratio * scaling_factor) as u32); 
+                        canvas_clone.set_height((height as f64 * device_pixel_ratio * scaling_factor) as u32);
 
                         let backend = CanvasBackend::with_canvas_object(canvas_clone).expect("backend");
                         let root = backend.into_drawing_area();
@@ -139,8 +143,8 @@ impl Component for TimeSeriesChart {
                         .y_label_formatter(&|y| format!("{:.1}", y))
                         .draw()
                         .unwrap();
-                        
-                        
+
+
                         for series in &config.series {
 
                             let style = ShapeStyle::from(&series.color).stroke_width(3);
