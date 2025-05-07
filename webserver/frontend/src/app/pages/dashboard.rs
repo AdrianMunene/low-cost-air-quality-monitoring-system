@@ -25,10 +25,9 @@ pub fn dashboard() -> Html {
 
     html! {
         <div class="dashboard-wrapper">
-            <h2 class="dashboard-title">{ "Air Quality Dashboard" }</h2>
-
             // Time filter component
             <div class="dashboard-controls">
+                <span class="time-range-label">{"Time Range:"}</span>
                 <TimeFilterComponent
                     selected_range={(*selected_time_range).clone()}
                     on_range_change={on_time_range_change.clone()}
