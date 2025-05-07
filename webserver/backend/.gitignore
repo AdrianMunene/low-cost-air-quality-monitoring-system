@@ -1,3 +1,4 @@
 /target/
 /curl_scripts/
 /certificates/
+*.env
