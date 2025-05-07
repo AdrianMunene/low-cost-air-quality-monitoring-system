@@ -1,6 +1,7 @@
 use yew::prelude::*;
-use chrono::{DateTime, Utc, TimeZone, NaiveDate, NaiveDateTime};
+use chrono::{DateTime, Utc};
 use crate::app::utils::time_filter::TimeRange;
+use crate::app::utils::parse_timestamp::parse_timestamp;
 use web_sys::{HtmlSelectElement, HtmlInputElement};
 
 #[derive(Properties, Clone, PartialEq)]
@@ -194,8 +195,11 @@ pub fn time_filter(props: &TimeFilterProps) -> Html {
 
 // Helper function to parse a date string (YYYY-MM-DD) to DateTime<Utc>
 fn parse_date(date_str: &str) -> Option<DateTime<Utc>> {
-    // Use the parse_timestamp function from air_quality_client
-    match crate::app::utils::air_quality_client::parse_timestamp(date_str) {
+    // Format the date string to include time
+    let datetime_str = format!("{} 00:00:00 +0000", date_str);
+
+    // Use the parse_timestamp function
+    match parse_timestamp(&datetime_str) {
         Ok(dt) => Some(dt),
         Err(e) => {
             log::warn!("Failed to parse date: {} - Error: {}", date_str, e);

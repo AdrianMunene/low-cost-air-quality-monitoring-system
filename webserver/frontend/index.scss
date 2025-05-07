@@ -63,6 +63,17 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
+/* Dashboard Controls */
+.dashboard-controls {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: var(--card-bg);
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
 /* Main chart grid - 2x2 layout */
 .dashboard-grid {
     display: grid;
@@ -322,6 +333,59 @@ canvas {
     }
 }
 
+/* Time Filter Component */
+.time-filter {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    color: var(--text-color);
+
+    .time-filter-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        label {
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        select, input {
+            background-color: var(--chart-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+
+            &:focus {
+                outline: none;
+                border-color: var(--accent-color);
+            }
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+
+            &:hover {
+                background-color: darken(#f59e0b, 10%);
+            }
+        }
+    }
+
+    .time-filter-custom {
+        margin-top: 0.5rem;
+    }
+}
+
 /* Animation for the live indicator */
 @keyframes pulse {
     0% {
@@ -391,6 +455,41 @@ canvas {
     .dashboard-title {
         font-size: 1rem;
         margin-bottom: 0.5rem;
+    }
+
+    .dashboard-controls {
+        flex-direction: column;
+        padding: 0.5rem;
+    }
+
+    .time-filter {
+        width: 100%;
+
+        .time-filter-row {
+            flex-wrap: wrap;
+
+            label {
+                min-width: 80px;
+            }
+
+            select, input {
+                flex: 1;
+            }
+        }
+
+        .time-filter-custom .time-filter-row {
+            flex-direction: column;
+            align-items: flex-start;
+
+            input {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            button {
+                align-self: flex-end;
+            }
+        }
     }
 
     .app-header {

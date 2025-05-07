@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc, Duration};
-use serde::{Serialize, Deserialize};
 
-#[derive(Clone, PartialEq, Debug, Serialize, Deserialize)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum TimeRange {
     Today,
     Yesterday,
