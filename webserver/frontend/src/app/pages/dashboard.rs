@@ -1,13 +1,22 @@
 use yew::prelude::*;
-use crate::app::instances::particulate_matter::ParticulateMatterChart;
-use crate::app::instances::temperature::TemperatureChart;
-use crate::app::instances::pressure::PressureChart;
-use crate::app::instances::humidity::HumidityChart;
-use crate::app::instances::carbon_iv_oxide::CarbonIVOxideChart;
-use crate::app::instances::carbon_ii_oxide::CarbonIIOxideChart;
-use crate::app::instances::ozone::OzoneChart;
 use crate::app::components::time_filter::TimeFilterComponent;
 use crate::app::utils::time_filter::TimeRange;
+
+// Import chart components
+use crate::app::instances::charts::particulate_matter::ParticulateMatterChart;
+use crate::app::instances::charts::temperature::TemperatureChart;
+use crate::app::instances::charts::pressure::PressureChart;
+use crate::app::instances::charts::humidity::HumidityChart;
+use crate::app::instances::charts::carbon_iv_oxide::CarbonIVOxideChart;
+use crate::app::instances::charts::carbon_ii_oxide::CarbonIIOxideChart;
+use crate::app::instances::charts::ozone::OzoneChart;
+
+// Import average metrics components
+use crate::app::instances::average_metrics::average_environmental::AverageEnvironmentalMetrics;
+use crate::app::instances::average_metrics::average_particulate::AverageParticulateMetrics;
+use crate::app::instances::average_metrics::average_co::AverageCOMetrics;
+use crate::app::instances::average_metrics::average_co2::AverageCO2Metrics;
+use crate::app::instances::average_metrics::average_o3::AverageO3Metrics;
 
 #[function_component(Dashboard)]
 pub fn dashboard() -> Html {
@@ -31,6 +40,24 @@ pub fn dashboard() -> Html {
                     selected_range={(*selected_time_range).clone()}
                     on_range_change={on_time_range_change.clone()}
                 />
+            </div>
+
+            // Average metrics row
+            <div class="dashboard-metrics">
+                // Environmental metrics (Temperature, Humidity, Pressure)
+                <AverageEnvironmentalMetrics time_range={(*selected_time_range).clone()} />
+
+                // Particulate matter metrics (PM1.0, PM2.5, PM10)
+                <AverageParticulateMetrics time_range={(*selected_time_range).clone()} />
+
+                // Carbon monoxide metrics
+                <AverageCOMetrics time_range={(*selected_time_range).clone()} />
+
+                // Carbon dioxide metrics
+                <AverageCO2Metrics time_range={(*selected_time_range).clone()} />
+
+                // Ozone metrics
+                <AverageO3Metrics time_range={(*selected_time_range).clone()} />
             </div>
 
             // Main grid with all charts

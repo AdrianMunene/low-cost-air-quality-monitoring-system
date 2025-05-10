@@ -421,6 +421,121 @@ canvas {
     }
 }
 
+/* Average Metrics Component */
+.average-metrics {
+    background-color: var(--card-bg);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    height: 100%;
+
+    &:hover {
+        box-shadow: 0 6px 12px var(--shadow-color);
+        transform: translateY(-2px);
+    }
+}
+
+.metrics-header {
+    padding: 0.5rem 0.75rem;
+    background-color: var(--chart-header-bg);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 28px;
+
+    h3 {
+        margin: 0;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+}
+
+.metrics-content {
+    flex: 1;
+    position: relative;
+    padding: 0.75rem;
+    background-color: var(--chart-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.metric-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.metric-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.metric-unit {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-left: 0.25rem;
+}
+
+.metrics-loading, .metrics-empty {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+/* Dashboard Metrics Row */
+.dashboard-metrics {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-metrics {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-metrics {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Animation for the live indicator */
 @keyframes pulse {
     0% {
