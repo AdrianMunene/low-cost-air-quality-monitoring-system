@@ -156,35 +156,59 @@ pub fn time_filter(props: &TimeFilterProps) -> Html {
     html! {
         <div class="time-filter">
             <div class="time-filter-row">
-                <label for="time-range" class="time-range-label">{"Time Range:"}</label>
-                <select id="time-range" value={selected_value} onchange={on_select} class="time-range-select">
-                    <option value="today">{"Today"}</option>
-                    <option value="yesterday">{"Yesterday"}</option>
-                    <option value="last_week">{"Last 7 Days"}</option>
-                    <option value="last_month">{"Last 30 Days"}</option>
-                    <option value="custom">{"Custom Range"}</option>
-                </select>
+                {
+                    if *show_custom_dates {
+                        // Show only custom date inputs when in custom mode
+                        html! {
+                            <>
+                                <label for="start-date">{"Start Date:"}</label>
+                                <input
+                                    type="date"
+                                    id="start-date"
+                                    value={(*start_date).clone()}
+                                    onchange={on_start_date_change}
+                                />
 
-                if *show_custom_dates {
-                    <>
-                        <label for="start-date">{"Start Date:"}</label>
-                        <input
-                            type="date"
-                            id="start-date"
-                            value={(*start_date).clone()}
-                            onchange={on_start_date_change}
-                        />
+                                <label for="end-date">{"End Date:"}</label>
+                                <input
+                                    type="date"
+                                    id="end-date"
+                                    value={(*end_date).clone()}
+                                    onchange={on_end_date_change}
+                                />
 
-                        <label for="end-date">{"End Date:"}</label>
-                        <input
-                            type="date"
-                            id="end-date"
-                            value={(*end_date).clone()}
-                            onchange={on_end_date_change}
-                        />
+                                <button onclick={on_apply_custom_range}>{"Apply"}</button>
+                                <button onclick={
+                                    let on_range_change = props.on_range_change.clone();
+                                    let show_custom_dates = show_custom_dates.clone();
+                                    let is_custom = matches!(props.selected_range, TimeRange::Custom(_, _));
 
-                        <button onclick={on_apply_custom_range}>{"Apply"}</button>
-                    </>
+                                    Callback::from(move |_| {
+                                        // If we're already in custom mode, we need to revert to a standard range
+                                        if is_custom {
+                                            // Default to Last 7 Days when canceling from custom
+                                            on_range_change.emit(TimeRange::LastWeek);
+                                        }
+                                        show_custom_dates.set(false);
+                                    })
+                                } class="cancel-button">{"Cancel"}</button>
+                            </>
+                        }
+                    } else {
+                        // Show dropdown when not in custom mode
+                        html! {
+                            <>
+                                <label for="time-range" class="time-range-label">{"Time Range:"}</label>
+                                <select id="time-range" value={selected_value} onchange={on_select} class="time-range-select">
+                                    <option value="today">{"Today"}</option>
+                                    <option value="yesterday">{"Yesterday"}</option>
+                                    <option value="last_week">{"Last 7 Days"}</option>
+                                    <option value="last_month">{"Last 30 Days"}</option>
+                                    <option value="custom">{"Custom Range"}</option>
+                                </select>
+                            </>
+                        }
+                    }
                 }
             </div>
         </div>
