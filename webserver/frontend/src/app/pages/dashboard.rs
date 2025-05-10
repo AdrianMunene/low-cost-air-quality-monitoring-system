@@ -11,6 +11,9 @@ use crate::app::instances::charts::carbon_iv_oxide::CarbonIVOxideChart;
 use crate::app::instances::charts::carbon_ii_oxide::CarbonIIOxideChart;
 use crate::app::instances::charts::ozone::OzoneChart;
 
+// Import AQI component
+use crate::app::instances::aqi::aqi_metrics::AqiMetrics;
+
 // Import average metrics components
 use crate::app::instances::average_metrics::average_environmental::AverageEnvironmentalMetrics;
 use crate::app::instances::average_metrics::average_particulate::AverageParticulateMetrics;
@@ -34,12 +37,20 @@ pub fn dashboard() -> Html {
 
     html! {
         <div class="dashboard-wrapper">
-            // Time filter component
-            <div class="dashboard-controls">
-                <TimeFilterComponent
-                    selected_range={(*selected_time_range).clone()}
-                    on_range_change={on_time_range_change.clone()}
-                />
+            // Time filter and AQI row
+            <div class="dashboard-top-row">
+                // AQI display (leftmost position)
+                <div class="aqi-container">
+                    <AqiMetrics time_range={(*selected_time_range).clone()} />
+                </div>
+
+                // Time filter component
+                <div class="dashboard-controls time-filter-container">
+                    <TimeFilterComponent
+                        selected_range={(*selected_time_range).clone()}
+                        on_range_change={on_time_range_change.clone()}
+                    />
+                </div>
             </div>
 
             // Average metrics row
