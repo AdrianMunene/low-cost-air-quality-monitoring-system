@@ -2,12 +2,15 @@ use yew::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use crate::app::utils::air_quality_client::{get_air_quality_data, AirQualityData};
 use crate::app::utils::time_filter::TimeRange;
+use crate::app::utils::location_filter::{LocationFilter, filter_data_by_location};
 use crate::app::utils::average_calculator::calculate_average;
 use crate::app::components::average_metrics::{AverageMetrics, AverageMetricsProps, MetricData};
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct O3MetricsProps {
     pub time_range: TimeRange,
+    #[prop_or_else(|| LocationFilter::All)]
+    pub location_filter: LocationFilter,
 }
 
 #[function_component(AverageO3Metrics)]
@@ -15,24 +18,27 @@ pub fn average_o3_metrics(props: &O3MetricsProps) -> Html {
     let metrics = use_state(|| Vec::<MetricData>::new());
     let is_loading = use_state(|| true);
     let time_range = props.time_range.clone();
+    let location_filter = props.location_filter.clone();
 
     // Fetch data and calculate averages
     {
         let metrics = metrics.clone();
         let is_loading = is_loading.clone();
+        let location_filter = location_filter.clone();
 
-        use_effect_with(time_range.clone(), move |time_range| {
+        use_effect_with((time_range.clone(), location_filter.clone()), move |(time_range, location_filter)| {
             let time_range = time_range.clone();
+            let location_filter = location_filter.clone();
             is_loading.set(true);
             metrics.set(Vec::new());
 
             spawn_local(async move {
                 match get_air_quality_data().await {
-                    Ok(data) => {
+                    Ok(fetched_data) => {
                         let mut metrics_vec = Vec::new();
 
                         // Calculate O3 average
-                        if let Some(avg_o3) = calculate_average(&data, &time_range, |record| record.o3) {
+                        if let Some(avg_o3) = calculate_average(&fetched_data, &time_range, &location_filter, |record| record.o3) {
                             metrics_vec.push(MetricData {
                                 label: "Ozone".to_string(),
                                 value: avg_o3,

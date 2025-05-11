@@ -6,3 +6,4 @@ pub mod range_calculations;
 pub mod series_builder;
 pub mod time_formatter;
 pub mod time_filter;
+pub mod location_filter;

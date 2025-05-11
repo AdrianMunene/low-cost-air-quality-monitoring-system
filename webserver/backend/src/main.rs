@@ -7,6 +7,7 @@ use handlers::{create_air_quality_record, get_air_quality_record};
 
 mod database;
 mod handlers;
+mod geocoding;
 
 #[tokio::main]
 async fn main() {

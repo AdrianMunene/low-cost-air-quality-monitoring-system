@@ -1,5 +1,6 @@
 use crate::app::utils::air_quality_client::AirQualityData;
 use crate::app::utils::time_filter::{TimeRange, filter_data_by_time_range};
+use crate::app::utils::location_filter::{LocationFilter, filter_data_by_location};
 use crate::app::utils::parse_timestamp::parse_timestamp;
 use std::cmp::Ordering;
 
@@ -157,16 +158,24 @@ fn calculate_aqi_for_pollutant(concentration: f64, breakpoints: &[Breakpoint]) -
 fn calculate_average_concentration<F>(
     data: &[AirQualityData],
     time_range: &TimeRange,
+    location_filter: &LocationFilter,
     value_extractor: F,
 ) -> Option<f64>
 where
     F: Fn(&AirQualityData) -> Option<f64>,
 {
-    // Filter data by time range
-    let filtered_data = filter_data_by_time_range(
+    // First filter data by time range
+    let time_filtered_data = filter_data_by_time_range(
         data,
         time_range,
         |record| parse_timestamp(&record.timestamp).ok(),
+    );
+
+    // Then filter by location
+    let filtered_data = filter_data_by_location(
+        &time_filtered_data,
+        location_filter,
+        |record| record.location.clone(),
     );
 
     // Extract values and calculate average
@@ -184,12 +193,12 @@ where
 }
 
 /// Calculate AQI for all pollutants and return the overall AQI
-pub fn calculate_overall_aqi(data: &[AirQualityData], time_range: &TimeRange) -> Option<AqiResult> {
+pub fn calculate_overall_aqi(data: &[AirQualityData], time_range: &TimeRange, location_filter: &LocationFilter) -> Option<AqiResult> {
     // Calculate average concentrations
-    let avg_pm25 = calculate_average_concentration(data, time_range, |record| record.pm2_5);
-    let avg_pm10 = calculate_average_concentration(data, time_range, |record| record.pm10);
-    let avg_co = calculate_average_concentration(data, time_range, |record| record.co);
-    let avg_o3 = calculate_average_concentration(data, time_range, |record| record.o3);
+    let avg_pm25 = calculate_average_concentration(data, time_range, location_filter, |record| record.pm2_5);
+    let avg_pm10 = calculate_average_concentration(data, time_range, location_filter, |record| record.pm10);
+    let avg_co = calculate_average_concentration(data, time_range, location_filter, |record| record.co);
+    let avg_o3 = calculate_average_concentration(data, time_range, location_filter, |record| record.o3);
 
     // Calculate AQI for each pollutant
     let mut aqi_values = Vec::new();

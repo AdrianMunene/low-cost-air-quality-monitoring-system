@@ -10,31 +10,43 @@ use crate::app::components::time_series_chart::{
     ChartSeries,
 };
 use crate::app::utils::time_filter::{TimeRange, filter_data_by_time_range};
+use crate::app::utils::location_filter::{LocationFilter, filter_data_by_location};
 use std::rc::Rc;
 use plotters::prelude::*;
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct PressureChartProps {
     pub time_range: TimeRange,
+    #[prop_or_else(|| LocationFilter::All)]
+    pub location_filter: LocationFilter,
 }
 
 #[function_component(PressureChart)]
 pub fn pressure_chart(props: &PressureChartProps) -> Html {
     let chart_config = use_state(|| None::<TimeSeriesChartProps>);
     let time_range = props.time_range.clone();
+    let location_filter = props.location_filter.clone();
 
     {
         let chart_config = chart_config.clone();
         let time_range = time_range.clone();
+        let location_filter = location_filter.clone();
 
         spawn_local(async move {
             match get_air_quality_data().await {
                 Ok(fetched_data) => {
-                    // Filter data by time range
-                    let filtered_data = filter_data_by_time_range(
+                    // First filter by time range
+                    let time_filtered_data = filter_data_by_time_range(
                         &fetched_data,
                         &time_range,
                         |record| parse_timestamp(&record.timestamp).ok()
+                    );
+
+                    // Then filter by location
+                    let filtered_data = filter_data_by_location(
+                        &time_filtered_data,
+                        &location_filter,
+                        |record| record.location.clone()
                     );
 
                     log::info!("Filtered data for Pressure chart: {} records", filtered_data.len());
@@ -91,11 +103,17 @@ pub fn pressure_chart(props: &PressureChartProps) -> Html {
         });
     }
 
-    // Re-fetch data when time range changes
+    // Re-fetch data when time range or location changes
     {
-        let chart_config = chart_config.clone();
+        let chart_config_time = chart_config.clone();
         use_effect_with(time_range, move |_| {
-            chart_config.set(None); // Reset chart to show loading state
+            chart_config_time.set(None); // Reset chart to show loading state
+            || ()
+        });
+
+        let chart_config_location = chart_config.clone();
+        use_effect_with(location_filter, move |_| {
+            chart_config_location.set(None); // Reset chart to show loading state
             || ()
         });
     }

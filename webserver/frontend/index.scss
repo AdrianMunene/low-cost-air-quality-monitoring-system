@@ -343,8 +343,9 @@ canvas {
     }
 }
 
-/* Time Filter Component */
-.time-filter {
+/* Filter Components - Common Styles */
+.time-filter,
+.location-filter {
     display: flex;
     flex-direction: column;
     padding: 0.25rem;
@@ -354,7 +355,8 @@ canvas {
     justify-content: center; /* Center vertically */
     align-items: center; /* Center horizontally */
 
-    .time-filter-row {
+    .time-filter-row,
+    .location-filter-row {
         display: flex;
         align-items: center;
         gap: 0.3rem; /* Reduced gap */
@@ -376,7 +378,8 @@ canvas {
             margin: 0 0.2rem 0 0.5rem;
         }
 
-        .time-range-label {
+        .time-range-label,
+        .location-filter-label {
             font-weight: 600; /* Bold the label */
             font-size: 0.85rem; /* Slightly smaller font */
             color: var(--text-color);
@@ -384,7 +387,8 @@ canvas {
             margin-right: 0.5rem;
         }
 
-        .time-range-select {
+        .time-range-select,
+        .location-filter-select {
             min-width: 140px;
             background-color: var(--chart-bg);
             border: 1px solid var(--border-color);
@@ -560,13 +564,29 @@ canvas {
     height: 100%; /* Ensure full height */
 }
 
-.time-filter-container {
+.filters-container {
     grid-column: span 2; /* Span 2 columns */
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
     height: 100%; /* Ensure full height */
+}
+
+.filters-stack {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
+}
+
+.filter-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem 0;
 }
 
 .aqi-display {

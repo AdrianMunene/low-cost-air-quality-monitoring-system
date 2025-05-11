@@ -4,6 +4,7 @@ CREATE TABLE air_quality_data (
     timestamp DATETIME NOT NULL,
     longitude DOUBLE,
     latitude DOUBLE,
+    location TEXT,
     temperature DOUBLE,
     pressure DOUBLE,
     humidity DOUBLE,

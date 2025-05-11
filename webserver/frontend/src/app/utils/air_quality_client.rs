@@ -4,6 +4,9 @@ use serde::Deserialize;
 #[derive(Deserialize, Clone, PartialEq)]
 pub struct AirQualityData {
     pub timestamp: String,
+    pub longitude: Option<f64>,
+    pub latitude: Option<f64>,
+    pub location: Option<String>,
     pub temperature: Option<f64>,
     pub pressure: Option<f64>,
     pub humidity: Option<f64>,

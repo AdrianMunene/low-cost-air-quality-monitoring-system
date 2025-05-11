@@ -1,21 +1,30 @@
 use crate::app::utils::air_quality_client::AirQualityData;
 use crate::app::utils::time_filter::{TimeRange, filter_data_by_time_range};
+use crate::app::utils::location_filter::{LocationFilter, filter_data_by_location};
 use crate::app::utils::parse_timestamp::parse_timestamp;
 
 /// Calculate the average value for a specific metric from air quality data
 pub fn calculate_average<F>(
     data: &[AirQualityData],
     time_range: &TimeRange,
+    location_filter: &LocationFilter,
     value_extractor: F,
 ) -> Option<f64>
 where
     F: Fn(&AirQualityData) -> Option<f64>,
 {
-    // Filter data by time range
-    let filtered_data = filter_data_by_time_range(
+    // First filter data by time range
+    let time_filtered_data = filter_data_by_time_range(
         data,
         time_range,
         |record| parse_timestamp(&record.timestamp).ok(),
+    );
+
+    // Then filter by location
+    let filtered_data = filter_data_by_location(
+        &time_filtered_data,
+        location_filter,
+        |record| record.location.clone(),
     );
 
     // Extract values and calculate average
@@ -36,6 +45,7 @@ where
 pub fn calculate_multiple_averages(
     data: &[AirQualityData],
     time_range: &TimeRange,
+    location_filter: &LocationFilter,
 ) -> (
     Option<f64>, // temperature
     Option<f64>, // humidity
@@ -48,14 +58,14 @@ pub fn calculate_multiple_averages(
     Option<f64>, // o3
 ) {
     (
-        calculate_average(data, time_range, |record| record.temperature),
-        calculate_average(data, time_range, |record| record.humidity),
-        calculate_average(data, time_range, |record| record.pressure),
-        calculate_average(data, time_range, |record| record.pm1_0),
-        calculate_average(data, time_range, |record| record.pm2_5),
-        calculate_average(data, time_range, |record| record.pm10),
-        calculate_average(data, time_range, |record| record.co2),
-        calculate_average(data, time_range, |record| record.co),
-        calculate_average(data, time_range, |record| record.o3),
+        calculate_average(data, time_range, location_filter, |record| record.temperature),
+        calculate_average(data, time_range, location_filter, |record| record.humidity),
+        calculate_average(data, time_range, location_filter, |record| record.pressure),
+        calculate_average(data, time_range, location_filter, |record| record.pm1_0),
+        calculate_average(data, time_range, location_filter, |record| record.pm2_5),
+        calculate_average(data, time_range, location_filter, |record| record.pm10),
+        calculate_average(data, time_range, location_filter, |record| record.co2),
+        calculate_average(data, time_range, location_filter, |record| record.co),
+        calculate_average(data, time_range, location_filter, |record| record.o3),
     )
 }

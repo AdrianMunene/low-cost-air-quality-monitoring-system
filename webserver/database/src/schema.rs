@@ -6,6 +6,7 @@ diesel::table! {
         timestamp -> Timestamp,
         longitude -> Nullable<Double>,
         latitude -> Nullable<Double>,
+        location -> Nullable<Text>,
         temperature -> Nullable<Double>,
         pressure -> Nullable<Double>,
         humidity -> Nullable<Double>,
