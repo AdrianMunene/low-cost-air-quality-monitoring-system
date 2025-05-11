@@ -10,7 +10,7 @@ use std::rc::Rc;
 #[derive(Properties, Clone, PartialEq)]
 pub struct EnvironmentalMetricsProps {
     pub time_range: TimeRange,
-    #[prop_or_else(|| LocationFilter::All)]
+    #[prop_or_else(|| LocationFilter::MostRecent)]
     pub location_filter: LocationFilter,
 }
 

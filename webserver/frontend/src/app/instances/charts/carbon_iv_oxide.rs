@@ -17,7 +17,7 @@ use plotters::prelude::*;
 #[derive(Properties, Clone, PartialEq)]
 pub struct CarbonIVOxideChartProps {
     pub time_range: TimeRange,
-    #[prop_or_else(|| LocationFilter::All)]
+    #[prop_or_else(|| LocationFilter::MostRecent)]
     pub location_filter: LocationFilter,
 }
 
@@ -46,7 +46,8 @@ pub fn carbon_iv_oxide_chart(props: &CarbonIVOxideChartProps) -> Html {
                     let filtered_data = filter_data_by_location(
                         &time_filtered_data,
                         &location_filter,
-                        |record| record.location.clone()
+                        |record| record.location.clone(),
+                        |record| parse_timestamp(&record.timestamp).ok()
                     );
 
                     log::info!("Filtered data for CO2 chart: {} records", filtered_data.len());

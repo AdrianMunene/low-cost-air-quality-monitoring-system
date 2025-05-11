@@ -9,7 +9,7 @@ use crate::app::components::average_metrics::{AverageMetrics, AverageMetricsProp
 #[derive(Properties, Clone, PartialEq)]
 pub struct CO2MetricsProps {
     pub time_range: TimeRange,
-    #[prop_or_else(|| LocationFilter::All)]
+    #[prop_or_else(|| LocationFilter::MostRecent)]
     pub location_filter: LocationFilter,
 }
 

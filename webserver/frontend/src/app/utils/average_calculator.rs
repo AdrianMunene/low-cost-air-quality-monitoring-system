@@ -25,6 +25,7 @@ where
         &time_filtered_data,
         location_filter,
         |record| record.location.clone(),
+        |record| parse_timestamp(&record.timestamp).ok(),
     );
 
     // Extract values and calculate average

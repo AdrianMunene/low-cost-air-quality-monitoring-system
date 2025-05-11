@@ -28,8 +28,8 @@ pub fn dashboard() -> Html {
     // State for the selected time range - default to LastMonth
     let selected_time_range = use_state(|| TimeRange::LastMonth);
 
-    // State for the selected location - default to All
-    let selected_location = use_state(|| LocationFilter::All);
+    // State for the selected location - default to MostRecent
+    let selected_location = use_state(|| LocationFilter::MostRecent);
 
     // Callback for when the time range changes
     let on_time_range_change = {

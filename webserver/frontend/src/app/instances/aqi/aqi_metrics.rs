@@ -9,7 +9,7 @@ use crate::app::components::aqi_display::{AqiDisplay, AqiDisplayProps};
 #[derive(Properties, Clone, PartialEq)]
 pub struct AqiMetricsProps {
     pub time_range: TimeRange,
-    #[prop_or_else(|| LocationFilter::All)]
+    #[prop_or_else(|| LocationFilter::MostRecent)]
     pub location_filter: LocationFilter,
 }
 
