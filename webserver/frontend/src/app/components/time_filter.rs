@@ -177,21 +177,23 @@ pub fn time_filter(props: &TimeFilterProps) -> Html {
                                     onchange={on_end_date_change}
                                 />
 
-                                <button onclick={on_apply_custom_range}>{"Apply"}</button>
-                                <button onclick={
-                                    let on_range_change = props.on_range_change.clone();
-                                    let show_custom_dates = show_custom_dates.clone();
-                                    let is_custom = matches!(props.selected_range, TimeRange::Custom(_, _));
+                                <div class="button-group">
+                                    <button onclick={on_apply_custom_range} class="apply-button">{"✓"}</button>
+                                    <button onclick={
+                                        let on_range_change = props.on_range_change.clone();
+                                        let show_custom_dates = show_custom_dates.clone();
+                                        let is_custom = matches!(props.selected_range, TimeRange::Custom(_, _));
 
-                                    Callback::from(move |_| {
-                                        // If we're already in custom mode, we need to revert to a standard range
-                                        if is_custom {
-                                            // Default to Last 7 Days when canceling from custom
-                                            on_range_change.emit(TimeRange::LastWeek);
-                                        }
-                                        show_custom_dates.set(false);
-                                    })
-                                } class="cancel-button">{"Cancel"}</button>
+                                        Callback::from(move |_| {
+                                            // If we're already in custom mode, we need to revert to a standard range
+                                            if is_custom {
+                                                // Default to Last 7 Days when canceling from custom
+                                                on_range_change.emit(TimeRange::LastWeek);
+                                            }
+                                            show_custom_dates.set(false);
+                                        })
+                                    } class="cancel-button">{"✕"}</button>
+                                </div>
                             </>
                         }
                     } else {
