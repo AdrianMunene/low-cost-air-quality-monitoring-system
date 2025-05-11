@@ -37,38 +37,40 @@ pub fn dashboard() -> Html {
 
     html! {
         <div class="dashboard-wrapper">
-            // Time filter and AQI row
-            <div class="dashboard-top-row">
-                // AQI display (leftmost position)
-                <div class="aqi-container">
-                    <AqiMetrics time_range={(*selected_time_range).clone()} />
+            <div class="dashboard-metrics-section">
+                // Time filter and AQI row - grid layout matching average metrics below
+                <div class="dashboard-top-row">
+                    // AQI display (spans 3 columns)
+                    <div class="aqi-container">
+                        <AqiMetrics time_range={(*selected_time_range).clone()} />
+                    </div>
+
+                    // Time filter component (spans 2 columns)
+                    <div class="dashboard-controls time-filter-container">
+                        <TimeFilterComponent
+                            selected_range={(*selected_time_range).clone()}
+                            on_range_change={on_time_range_change.clone()}
+                        />
+                    </div>
                 </div>
 
-                // Time filter component
-                <div class="dashboard-controls time-filter-container">
-                    <TimeFilterComponent
-                        selected_range={(*selected_time_range).clone()}
-                        on_range_change={on_time_range_change.clone()}
-                    />
+                // Average metrics row
+                <div class="dashboard-metrics">
+                    // Environmental metrics (Temperature, Humidity, Pressure)
+                    <AverageEnvironmentalMetrics time_range={(*selected_time_range).clone()} />
+
+                    // Particulate matter metrics (PM1.0, PM2.5, PM10)
+                    <AverageParticulateMetrics time_range={(*selected_time_range).clone()} />
+
+                    // Carbon monoxide metrics
+                    <AverageCOMetrics time_range={(*selected_time_range).clone()} />
+
+                    // Carbon dioxide metrics
+                    <AverageCO2Metrics time_range={(*selected_time_range).clone()} />
+
+                    // Ozone metrics
+                    <AverageO3Metrics time_range={(*selected_time_range).clone()} />
                 </div>
-            </div>
-
-            // Average metrics row
-            <div class="dashboard-metrics">
-                // Environmental metrics (Temperature, Humidity, Pressure)
-                <AverageEnvironmentalMetrics time_range={(*selected_time_range).clone()} />
-
-                // Particulate matter metrics (PM1.0, PM2.5, PM10)
-                <AverageParticulateMetrics time_range={(*selected_time_range).clone()} />
-
-                // Carbon monoxide metrics
-                <AverageCOMetrics time_range={(*selected_time_range).clone()} />
-
-                // Carbon dioxide metrics
-                <AverageCO2Metrics time_range={(*selected_time_range).clone()} />
-
-                // Ozone metrics
-                <AverageO3Metrics time_range={(*selected_time_range).clone()} />
             </div>
 
             // Main grid with all charts

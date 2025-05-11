@@ -68,8 +68,6 @@ body {
     display: flex;
     justify-content: center; /* Changed to center */
     align-items: center;
-    margin-bottom: 0.75rem;
-    padding: 0.5rem 0.75rem;
     background-color: var(--card-bg);
     border-radius: 0.5rem;
     box-shadow: 0 4px 8px var(--shadow-color);
@@ -77,6 +75,12 @@ body {
     height: 100%; /* Take full height of parent */
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 6px 12px var(--shadow-color);
+        transform: translateY(-2px);
+    }
 }
 
 /* Main chart grid - 2x2 layout */
@@ -538,30 +542,30 @@ canvas {
 
 /* Dashboard Top Row */
 .dashboard-top-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr; /* 5 column grid to match average metrics */
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem; /* Reduced margin between rows in the same section */
     width: 100%;
     align-items: stretch; /* Make all children stretch to the same height */
-    height: 45px; /* Set a consistent height */
+    height: auto; /* Let height be determined by content */
+    padding: 0; /* Remove any padding */
 }
 
 .aqi-container {
-    flex: 0.6; /* 60% of the space */
-    min-width: 500px; /* Further reduced from 600px */
+    grid-column: span 3; /* Span 3 columns */
     display: flex;
     align-items: center;
-    padding: 0 0.5rem;
+    padding: 0;
     height: 100%; /* Ensure full height */
 }
 
 .time-filter-container {
-    flex: 0.4; /* 40% of the space */
-    min-width: 250px;
+    grid-column: span 2; /* Span 2 columns */
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 0.5rem;
+    padding: 0;
     height: 100%; /* Ensure full height */
 }
 
@@ -577,6 +581,12 @@ canvas {
     height: 100%; /* Take full height of parent */
     border: 1px solid rgba(255, 255, 255, 0.05);
     box-sizing: border-box; /* Ensure padding is included in height/width */
+    transition: all 0.2s ease;
+
+    &:hover {
+        box-shadow: 0 6px 12px var(--shadow-color);
+        transform: translateY(-2px);
+    }
 }
 
 .aqi-index-label {
@@ -722,13 +732,20 @@ canvas {
     font-size: 0.75rem;
 }
 
+/* Dashboard Metrics Section - wrapper for both rows */
+.dashboard-metrics-section {
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
 /* Dashboard Metrics Row */
 .dashboard-metrics {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     gap: 1rem;
     width: 100%;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0; /* No margin between rows in the same section */
+    padding: 0; /* Ensure no padding for alignment */
 }
 
 @media (max-width: 1200px) {
@@ -737,17 +754,16 @@ canvas {
     }
 
     .dashboard-top-row {
-        flex-direction: column;
+        grid-template-columns: 1fr 1fr 1fr;
     }
 
     .aqi-container {
-        flex: 0 0 auto;
-        width: 100%;
-        margin-bottom: 1rem;
+        grid-column: span 2; /* Span 2 columns on medium screens */
+        margin-bottom: 0;
     }
 
     .time-filter-container {
-        width: 100%;
+        grid-column: span 1; /* Span 1 column on medium screens */
     }
 
     /* Adjust AQI row for smaller screens */
@@ -784,11 +800,35 @@ canvas {
     .dashboard-metrics {
         grid-template-columns: 1fr 1fr;
     }
+
+    .dashboard-top-row {
+        grid-template-columns: 1fr 1fr;
+        height: auto;
+    }
+
+    .aqi-container {
+        grid-column: span 2; /* Full width on small screens */
+    }
+
+    .time-filter-container {
+        grid-column: span 2; /* Full width on small screens */
+        margin-top: 1rem;
+    }
 }
 
 @media (max-width: 480px) {
     .dashboard-metrics {
         grid-template-columns: 1fr;
+    }
+
+    .dashboard-top-row {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+
+    .aqi-container,
+    .time-filter-container {
+        grid-column: span 1; /* Full width on extra small screens */
     }
 }
 
