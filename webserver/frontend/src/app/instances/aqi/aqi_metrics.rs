@@ -2,9 +2,9 @@ use yew::prelude::*;
 use wasm_bindgen_futures::spawn_local;
 use crate::app::utils::air_quality_client::get_air_quality_data;
 use crate::app::utils::time_filter::TimeRange;
-use crate::app::utils::location_filter::{LocationFilter, filter_data_by_location};
+use crate::app::utils::location_filter::LocationFilter;
 use crate::app::utils::aqi_calculator::calculate_overall_aqi;
-use crate::app::components::aqi_display::{AqiDisplay, AqiDisplayProps};
+use crate::app::components::aqi_display::AqiDisplay;
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct AqiMetricsProps {

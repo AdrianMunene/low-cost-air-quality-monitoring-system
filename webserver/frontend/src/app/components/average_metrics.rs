@@ -1,5 +1,4 @@
 use yew::prelude::*;
-use std::collections::HashMap;
 
 /// A single metric to display
 #[derive(Clone, PartialEq)]

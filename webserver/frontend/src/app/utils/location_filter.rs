@@ -1,5 +1,4 @@
 use crate::app::utils::air_quality_client::AirQualityData;
-use crate::app::utils::parse_timestamp::parse_timestamp;
 use chrono::{DateTime, Utc};
 
 #[derive(Clone, PartialEq, Debug)]

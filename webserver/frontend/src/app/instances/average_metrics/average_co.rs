@@ -1,10 +1,10 @@
 use yew::prelude::*;
 use wasm_bindgen_futures::spawn_local;
-use crate::app::utils::air_quality_client::{get_air_quality_data, AirQualityData};
+use crate::app::utils::air_quality_client::get_air_quality_data;
 use crate::app::utils::time_filter::TimeRange;
-use crate::app::utils::location_filter::{LocationFilter, filter_data_by_location};
+use crate::app::utils::location_filter::LocationFilter;
 use crate::app::utils::average_calculator::calculate_average;
-use crate::app::components::average_metrics::{AverageMetrics, AverageMetricsProps, MetricData};
+use crate::app::components::average_metrics::{AverageMetrics, MetricData};
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct COMetricsProps {
