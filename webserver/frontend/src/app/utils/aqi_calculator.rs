@@ -42,7 +42,7 @@ fn get_aqi_category(aqi: i32) -> AqiCategory {
             description: "Air quality is acceptable. However, there may be a risk for some people, particularly those who are unusually sensitive to air pollution.".to_string(),
         },
         101..=150 => AqiCategory {
-            name: "Unhealthy for Sensitive Groups".to_string(),
+            name: "Unhealthy".to_string(),
             color: "#FF7E00".to_string(), // Orange
             description: "Members of sensitive groups may experience health effects. The general public is less likely to be affected.".to_string(),
         },
