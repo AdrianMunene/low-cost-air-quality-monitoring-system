@@ -52,21 +52,21 @@ pub fn dashboard() -> Html {
     html! {
         <div class="dashboard-wrapper">
             <div class="dashboard-metrics-section">
-                // Time filter and AQI row - grid layout matching average metrics below
-                <div class="dashboard-top-row">
-                    // AQI display (spans 3 columns)
-                    <div class="aqi-container">
-                        <AqiMetrics
-                            time_range={(*selected_time_range).clone()}
-                            location_filter={(*selected_location).clone()}
-                        />
-                    </div>
+                // Combined top row with AQI and filters
+                <div class="dashboard-top-combined">
+                    <div class="top-row-content">
+                        // AQI display
+                        <div class="aqi-container">
+                            <AqiMetrics
+                                time_range={(*selected_time_range).clone()}
+                                location_filter={(*selected_location).clone()}
+                            />
+                        </div>
 
-                    // Filters container (spans 2 columns)
-                    <div class="dashboard-controls filters-container">
-                        <div class="filters-stack">
+                        // Filters
+                        <div class="filters-container">
                             // Time filter component
-                            <div class="filter-item">
+                            <div class="time-filter-container">
                                 <TimeFilterComponent
                                     selected_range={(*selected_time_range).clone()}
                                     on_range_change={on_time_range_change.clone()}
@@ -74,7 +74,7 @@ pub fn dashboard() -> Html {
                             </div>
 
                             // Location filter component
-                            <div class="filter-item">
+                            <div class="location-filter-container">
                                 <LocationFilterComponent
                                     selected_location={(*selected_location).clone()}
                                     on_location_change={on_location_change.clone()}

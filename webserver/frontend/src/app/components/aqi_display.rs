@@ -47,7 +47,7 @@ pub fn aqi_display(props: &AqiDisplayProps) -> Html {
                                         <div class="aqi-bar-segment aqi-moderate">{ "Moderate" }</div>
                                         <div class="aqi-bar-segment aqi-unhealthy">{ "Unhealthy" }</div>
                                     </div>
-                                    <div class="aqi-indicator" style={format!("left: {}%; background-color: #000000", calculate_indicator_position(aqi_result.value))}></div>
+                                    <div class="aqi-indicator" style={format!("left: {}%", calculate_indicator_position(aqi_result.value))}></div>
                                 </div>
 
                                 <div class="aqi-dominant">

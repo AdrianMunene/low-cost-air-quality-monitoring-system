@@ -1,24 +1,24 @@
-/* Variables */
+/* Variables - Minimalist Blue, White, Orange, Black Theme */
 :root {
-    --page-bg: #121212;         /* Darker background for page */
-    --card-bg: #1e1e1e;         /* Lighter background for cards */
-    --card-hover-bg: #252525;   /* Slightly lighter on hover */
-    --header-bg: #0a0a0a;       /* Darker header */
-    --footer-bg: #0a0a0a;       /* Darker footer */
-    --chart-bg: #1e1e1e;        /* Chart background */
-    --chart-header-bg: #252525; /* Slightly darker chart header */
+    --page-bg: #000000;         /* Black background for page */
+    --card-bg: #111111;         /* Slightly lighter black for cards */
+    --card-hover-bg: #1a1a1a;   /* Slightly lighter on hover */
+    --header-bg: #000000;       /* Black header */
+    --footer-bg: #000000;       /* Black footer */
+    --chart-bg: #111111;        /* Chart background */
+    --chart-header-bg: #1a1a1a; /* Slightly darker chart header */
 
-    --text-color: #f0f0f0;      /* Primary text color */
-    --text-secondary: #b0b0b0;  /* Secondary text color */
+    --text-color: #ffffff;      /* White text color */
+    --text-secondary: #cccccc;  /* Light gray secondary text */
 
     --border-color: rgba(255, 255, 255, 0.1); /* Subtle borders */
-    --shadow-color: rgba(0, 0, 0, 0.4);       /* Subtle shadows */
+    --shadow-color: rgba(0, 0, 0, 0.3);       /* Subtle shadows */
 
-    --accent-color: #f59e0b;    /* Accent color - amber */
-    --accent-secondary: #ef4444; /* Secondary accent - red */
-    --accent-tertiary: #3b82f6;  /* Tertiary accent - blue */
+    --accent-color: #ff8000;    /* Orange accent */
+    --accent-secondary: #ff4500; /* Darker orange */
+    --accent-tertiary: #0066cc;  /* Blue accent */
 
-    --online-indicator: #10b981; /* Green for online status */
+    --online-indicator: #00cc66; /* Green for online status */
     --chart-grid: rgba(255, 255, 255, 0.1); /* Subtle grid lines */
 }
 
@@ -66,20 +66,19 @@ body {
 /* Dashboard Controls */
 .dashboard-controls {
     display: flex;
-    justify-content: center; /* Changed to center */
+    justify-content: center;
     align-items: center;
     background-color: var(--card-bg);
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 8px var(--shadow-color);
+    border-radius: 0.25rem;
+    box-shadow: 0 2px 4px var(--shadow-color);
     width: 100%;
-    height: 100%; /* Take full height of parent */
+    height: 100%; /* Take full height of parent container */
     box-sizing: border-box;
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.2s ease;
 
     &:hover {
-        box-shadow: 0 6px 12px var(--shadow-color);
-        transform: translateY(-2px);
+        box-shadow: 0 3px 6px var(--shadow-color);
     }
 }
 
@@ -263,11 +262,14 @@ canvas {
 .app-header {
     background-color: var(--header-bg);
     color: var(--text-color);
-    padding: 10px 16px;
+    padding: 12px 16px;
     display: flex;
     align-items: center;
-    box-shadow: 0 1px 3px var(--shadow-color);
+    box-shadow: 0 2px 4px var(--shadow-color);
     z-index: 10;
+    border-bottom: 2px solid var(--accent-color); /* Orange underline */
+    padding-bottom: 12px; /* Reduced padding before the orange line */
+    margin-bottom: 5px; /* Reduced margin after the orange line */
 
     h1 {
         margin: 0;
@@ -343,132 +345,169 @@ canvas {
     }
 }
 
-/* Filter Components - Common Styles */
+/* Filter Components - Minimalist Styles */
 .time-filter,
 .location-filter {
     display: flex;
     flex-direction: column;
-    padding: 0.25rem;
     color: var(--text-color);
     width: 100%;
-    height: 100%; /* Take full height of parent */
-    justify-content: center; /* Center vertically */
-    align-items: center; /* Center horizontally */
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    min-height: 0; /* Prevent overflow */
 
     .time-filter-row,
     .location-filter-row {
         display: flex;
         align-items: center;
-        gap: 0.3rem; /* Reduced gap */
-        flex-wrap: nowrap; /* Prevent wrapping */
-        justify-content: center; /* Center horizontally */
-        height: 100%; /* Take full height */
-        width: 100%; /* Take full width */
-        text-align: center; /* Center text */
+        gap: 0.25rem;
+        flex-wrap: nowrap;
+        justify-content: flex-end; /* Align content to the right */
+        width: 100%;
+        text-align: right;
+        padding: 0;
 
         label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             white-space: nowrap;
             margin: 0;
         }
 
         /* Date input labels */
         label[for="start-date"], label[for="end-date"] {
-            font-size: 0.75rem;
-            margin: 0 0.2rem 0 0.5rem;
+            font-size: 0.7rem;
+            margin: 0 0.2rem 0 0.3rem;
         }
 
         .time-range-label,
         .location-filter-label {
-            font-weight: 600; /* Bold the label */
-            font-size: 0.85rem; /* Slightly smaller font */
+            font-weight: 600;
+            font-size: 0.85rem; /* Smaller font size */
             color: var(--text-color);
             white-space: nowrap;
-            margin-right: 0.5rem;
+            margin-right: 0.3rem;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.1); /* Very subtle text glow */
         }
 
         .time-range-select,
         .location-filter-select {
-            min-width: 140px;
+            min-width: 200px; /* Reduced width to fit in available space */
+            width: auto; /* Allow it to grow based on content */
             background-color: var(--chart-bg);
-            border: 1px solid var(--border-color);
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
             color: var(--text-color);
-            padding: 0.25rem 0.5rem;
-            font-size: 0.85rem;
-            border-radius: 0.25rem;
-            margin-right: 1rem; /* Increased spacing */
+            padding: 0.2rem 0.5rem; /* Minimal padding */
+            font-size: 0.85rem; /* Smaller font size */
+            border-radius: 0.2rem;
+            margin-right: 0.25rem;
+            height: 22px; /* Reduced height for compact layout */
+            box-shadow: none; /* No glow */
+            appearance: none; /* Remove default appearance */
+            -webkit-appearance: none; /* For Safari */
+            -moz-appearance: none; /* For Firefox */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.3rem center;
+            background-size: 12px 12px; /* Smaller custom dropdown arrow */
+            text-overflow: ellipsis; /* Add ellipsis for any text that might still overflow */
+            white-space: nowrap; /* Prevent text wrapping */
+            overflow: visible; /* Allow dropdown to overflow its container */
+            max-width: 100%; /* Ensure it doesn't exceed container width */
 
             option {
                 color: var(--text-color);
                 background-color: var(--chart-bg);
                 font-weight: normal;
+                font-size: 0.85rem; /* Smaller font size to match select */
+                padding: 0.3rem; /* Minimal padding */
+                min-height: 1.5rem; /* Shorter options */
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Subtle separator between options */
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: visible;
             }
         }
 
         select, input {
             background-color: var(--chart-bg);
             color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 0.25rem;
-            padding: 0.25rem 0.5rem;
-            font-size: 0.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
+            border-radius: 0.2rem;
+            padding: 0.2rem 0.5rem; /* Minimal padding */
+            font-size: 0.85rem; /* Smaller font size */
             width: auto;
-            min-width: 110px;
+            min-width: 200px; /* Match the dropdown width */
+            height: 22px; /* Match the dropdown height */
+            box-shadow: none; /* No glow */
+            appearance: none; /* Remove default appearance */
+            -webkit-appearance: none; /* For Safari */
+            -moz-appearance: none; /* For Firefox */
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.3rem center;
+            background-size: 12px 12px; /* Smaller custom dropdown arrow */
+            text-overflow: ellipsis; /* Add ellipsis for any text that might still overflow */
+            white-space: nowrap; /* Prevent text wrapping */
+            overflow: visible; /* Allow dropdown to overflow its container */
+            max-width: 100%; /* Ensure it doesn't exceed container width */
 
             &:focus {
                 outline: none;
-                border-color: var(--accent-color);
+                border: 1px solid rgba(255, 255, 255, 0.3); /* Slightly brighter border on focus */
+                box-shadow: 0 0 3px rgba(255, 255, 255, 0.2); /* Subtle white glow on focus */
             }
         }
 
         /* Custom date inputs styling */
         input[type="date"] {
-            min-width: 130px;
-            padding: 0.25rem 0.35rem;
-            font-size: 0.75rem;
+            min-width: 120px;
+            padding: 0.15rem 0.25rem;
+            font-size: 0.7rem;
+            height: 24px;
         }
 
         .button-group {
             display: flex;
-            gap: 0.25rem; /* Small gap between buttons */
-            margin-left: 0.5rem;
+            gap: 0.2rem;
+            margin-left: 0.3rem;
         }
 
         button {
             background-color: var(--accent-color);
             color: #000;
             border: none;
-            border-radius: 0.25rem;
-            padding: 0.25rem 0.5rem;
-            font-size: 1rem; /* Larger font for emoji */
+            border-radius: 0.2rem;
+            padding: 0.15rem 0.3rem;
+            font-size: 0.9rem;
             cursor: pointer;
             transition: background-color 0.2s;
             white-space: nowrap;
-            min-width: 40px; /* Smaller width for emoji buttons */
-            height: 30px; /* Fixed height */
+            min-width: 30px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
 
             &:hover {
-                background-color: darken(#f59e0b, 10%);
+                background-color: var(--accent-secondary);
             }
 
             &.apply-button {
-                background-color: #f59e0b; /* Orange color for apply */
-                color: white; /* White checkmark */
+                background-color: var(--accent-color);
+                color: white;
 
                 &:hover {
-                    background-color: darken(#f59e0b, 10%);
+                    background-color: var(--accent-secondary);
                 }
             }
 
             &.cancel-button {
-                background-color: #e53e3e; /* Red color for cancel */
-                color: white; /* White X */
+                background-color: var(--accent-tertiary);
+                color: white;
 
                 &:hover {
-                    background-color: darken(#e53e3e, 10%);
+                    background-color: darken(#0066cc, 10%);
                 }
             }
         }
@@ -563,73 +602,83 @@ canvas {
     text-align: center;
 }
 
-/* Dashboard Top Row */
-.dashboard-top-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr; /* 5 column grid to match average metrics */
-    gap: 1rem;
-    margin-bottom: 1rem; /* Reduced margin between rows in the same section */
+/* Dashboard Top Combined - Minimalist */
+.dashboard-top-combined {
     width: 100%;
-    align-items: stretch; /* Make all children stretch to the same height */
-    height: auto; /* Let height be determined by content */
-    padding: 0; /* Remove any padding */
+    margin-bottom: 1rem; /* Reduced margin after the blue line */
+    padding: 0;
+    border-bottom: 2px solid var(--accent-tertiary); /* Blue underline */
+    padding-bottom: 0.75rem; /* Reduced space before the underline */
+    margin-top: 0; /* No negative margin */
+}
+
+.top-row-content {
+    display: flex;
+    flex-direction: row; /* Changed back to row layout */
+    justify-content: space-between; /* Space between AQI and filters */
+    align-items: flex-start; /* Align items to the top */
+    width: 100%;
+    padding: 0 10px; /* Increased horizontal padding */
+    height: 50px; /* Reverted to original height */
+    padding-top: 5px; /* Add padding at the top */
 }
 
 .aqi-container {
-    grid-column: span 3; /* Span 3 columns */
     display: flex;
     align-items: center;
     padding: 0;
-    height: 100%; /* Ensure full height */
+    height: 50px; /* Reverted to original height */
+    flex: 1; /* Take available space */
+    margin-right: 25px; /* Increased space between AQI and filters */
 }
 
 .filters-container {
-    grid-column: span 2; /* Span 2 columns */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    height: 100%; /* Ensure full height */
-}
-
-.filters-stack {
     display: flex;
     flex-direction: column;
-    width: 100%;
-    height: 100%;
-    justify-content: space-between;
+    padding: 0;
+    gap: 10px; /* Increased space between the two filters */
+    justify-content: center; /* Center filters vertically */
+    align-items: flex-end; /* Align filters to the right */
+    min-width: 350px; /* Minimum width for filters */
+    margin-top: -5px; /* Move filters up slightly */
 }
 
-.filter-item {
-    flex: 1;
+.time-filter-container,
+.location-filter-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0.25rem 0;
+    justify-content: flex-end; /* Align content to the right */
+    width: 100%;
+    background-color: transparent; /* Transparent background */
+    padding: 0.15rem 0.25rem; /* Minimal padding */
+    overflow: visible; /* Allow content to overflow if needed */
+    height: 22px; /* Reduced height for compact layout */
+}
+
+/* Specific styling for time filter to position it higher */
+.time-filter-container {
+    margin-top: -8px; /* Move time filter up more */
+    padding-top: 0; /* Remove top padding */
+}
+
+/* Specific styling for location filter */
+.location-filter-container {
+    margin-top: -2px; /* Adjust location filter position */
 }
 
 .aqi-display {
-    background-color: var(--card-bg);
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 8px var(--shadow-color);
+    background-color: transparent; /* Transparent background */
     display: flex;
     flex-direction: column;
     position: relative;
-    overflow: hidden;
+    overflow: visible; /* Changed to visible to prevent cutting off */
     width: 100%;
-    height: 100%; /* Take full height of parent */
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-sizing: border-box; /* Ensure padding is included in height/width */
-    transition: all 0.2s ease;
-
-    &:hover {
-        box-shadow: 0 6px 12px var(--shadow-color);
-        transform: translateY(-2px);
-    }
+    height: 50px; /* Reverted to original height */
+    box-sizing: border-box;
 }
 
 .aqi-index-label {
-    font-size: 0.9rem; /* Increased font size */
+    font-size: 0.9rem;
     font-weight: 700;
     color: var(--text-color);
     margin-right: 0.5rem;
@@ -638,22 +687,23 @@ canvas {
 .aqi-content {
     display: flex;
     align-items: center;
-    justify-content: center;
-    background-color: var(--chart-bg);
+    justify-content: flex-start; /* Align to the left */
+    background-color: transparent; /* Transparent background */
     height: 100%;
     width: 100%;
-    padding: 0 0.5rem; /* Increased padding */
+    padding: 0;
+    overflow: visible; /* Ensure content isn't cut off */
 }
 
 .aqi-row {
     display: flex;
     align-items: center;
-    gap: 0.4rem;
+    gap: 2.5rem; /* Further increased spacing between AQI components */
     flex-wrap: nowrap;
-    justify-content: space-between; /* Changed from center to space-between */
+    justify-content: flex-start; /* Changed to flex-start for better spacing */
     width: 100%;
     height: 100%;
-    padding: 0 1rem; /* Added padding on both sides */
+    padding: 0 0.75rem; /* Increased horizontal padding */
 }
 
 .aqi-index-group {
@@ -661,34 +711,37 @@ canvas {
     align-items: center;
     white-space: nowrap;
     flex: 0 0 auto; /* Don't grow or shrink */
+    gap: 0.75rem; /* Increased gap between elements within the group */
+    margin-right: 0.5rem; /* Added right margin */
 }
 
 .aqi-index-label {
-    font-size: 0.85rem;
+    font-size: 0.95rem; /* Slightly reduced font size */
     font-weight: 700;
     color: var(--text-color);
     white-space: nowrap;
-    margin-right: 0.2rem; /* Reduced margin since it's now in a group */
+    margin-right: 0.3rem;
 }
 
 .aqi-bar-container {
     position: relative;
-    width: 250px; /* Increased from 220px */
-    height: 20px; /* Increased from 18px */
+    width: 300px; /* Even wider bar */
+    height: 16px; /* Slightly reduced height */
     display: flex;
     align-items: center;
-    flex: 1; /* Take up available space */
-    justify-content: center; /* Center the bar */
-    max-width: 250px; /* Increased from 220px */
+    flex: 1;
+    justify-content: center;
+    max-width: 300px;
+    margin: 0 1.5rem; /* Further increased horizontal margins */
 }
 
 .aqi-bar {
     display: flex;
     width: 100%;
-    height: 20px; /* Increased from 18px */
+    height: 16px; /* Slightly reduced height */
     border-radius: 3px;
     overflow: hidden;
-    align-self: center; /* Center vertically */
+    align-self: center;
 }
 
 .aqi-bar-segment {
@@ -696,63 +749,64 @@ canvas {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.65rem; /* Increased from 0.6rem */
+    font-size: 0.7rem; /* Slightly reduced font size */
     font-weight: 600;
-    color: rgba(0, 0, 0, 0.8);
+    color: #ffffff; /* White text */
 }
 
 .aqi-good {
-    background-color: #00E400; /* Green */
+    background-color: var(--accent-tertiary); /* Blue */
 }
 
 .aqi-moderate {
-    background-color: #FFFF00; /* Yellow */
+    background-color: var(--accent-color); /* Orange */
 }
 
 .aqi-unhealthy {
-    background-color: #FF0000; /* Red */
+    background-color: var(--accent-secondary); /* Darker orange */
 }
 
 .aqi-indicator {
     position: absolute;
     top: 50%;
-    width: 3px;
-    height: 24px; /* Increased from 22px */
+    width: 3px; /* Slightly wider indicator */
+    height: 20px; /* Slightly reduced height */
     border-radius: 1.5px;
-    transform: translate(-50%, -50%); /* Center both horizontally and vertically */
+    background-color: #ffffff; /* White indicator */
+    transform: translate(-50%, -50%);
 }
 
 .aqi-value {
-    font-size: 1rem;
+    font-size: 1.05rem; /* Slightly reduced font size */
     line-height: 1;
     font-weight: 700;
     white-space: nowrap;
-    margin: 0;
-    padding: 0 0.1rem;
+    margin: 0 0.75rem 0 0; /* Added right margin */
+    padding: 0;
+    color: var(--accent-color);
 }
 
 .aqi-category {
-    font-size: 0.85rem;
+    font-size: 0.9rem; /* Slightly reduced font size */
     line-height: 1;
     color: var(--text-color);
     font-weight: 600;
     white-space: nowrap;
-    margin: 0 0.3rem 0 0.5rem; /* Reduced right margin to bring closer to status bar */
+    margin: 0 1.25rem 0 1.25rem; /* Further increased horizontal margins */
     padding: 0.1rem 0.3rem;
     text-align: center;
-    flex: 0 0 auto; /* Don't grow or shrink */
+    flex: 0 0 auto;
 }
 
-/* Removed middle section */
-
 .aqi-dominant {
-    font-size: 0.75rem;
+    font-size: 0.8rem; /* Slightly reduced font size */
     white-space: nowrap;
     display: flex;
     align-items: center;
-    flex: 0 0 auto; /* Don't grow or shrink */
-    min-width: 140px;
-    gap: 0.35rem;
+    flex: 0 0 auto;
+    min-width: 160px; /* Increased minimum width */
+    gap: 0.75rem; /* Further increased gap between label and value */
+    margin-left: 1rem; /* Increased left margin */
 }
 
 .aqi-dominant-label {
@@ -761,7 +815,7 @@ canvas {
 }
 
 .aqi-dominant-value {
-    color: var(--text-color);
+    color: var(--accent-tertiary);
 }
 
 .aqi-loading, .aqi-no-data {
@@ -792,17 +846,13 @@ canvas {
         grid-template-columns: 1fr 1fr 1fr;
     }
 
-    .dashboard-top-row {
-        grid-template-columns: 1fr 1fr 1fr;
+    .top-row-content {
+        flex-direction: row;
+        height: auto;
     }
 
     .aqi-container {
-        grid-column: span 2; /* Span 2 columns on medium screens */
         margin-bottom: 0;
-    }
-
-    .time-filter-container {
-        grid-column: span 1; /* Span 1 column on medium screens */
     }
 
     /* Adjust AQI row for smaller screens */
@@ -840,18 +890,34 @@ canvas {
         grid-template-columns: 1fr 1fr;
     }
 
-    .dashboard-top-row {
-        grid-template-columns: 1fr 1fr;
+    .top-row-content {
+        flex-direction: column;
+        gap: 0.5rem; /* Reduced gap */
         height: auto;
     }
 
     .aqi-container {
-        grid-column: span 2; /* Full width on small screens */
+        height: auto;
+        margin-bottom: 0.5rem; /* Reduced margin */
+        margin-right: 0;
     }
 
-    .time-filter-container {
-        grid-column: span 2; /* Full width on small screens */
-        margin-top: 1rem;
+    .filters-container {
+        gap: 5px; /* Reduced gap */
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .time-filter-container,
+    .location-filter-container {
+        height: 22px;
+        padding: 0.1rem;
+        justify-content: flex-start;
+    }
+
+    .dashboard-top-combined {
+        padding-bottom: 0.5rem; /* Reduced padding */
+        margin-bottom: 0.75rem; /* Reduced margin */
     }
 }
 
@@ -860,14 +926,23 @@ canvas {
         grid-template-columns: 1fr;
     }
 
-    .dashboard-top-row {
-        grid-template-columns: 1fr;
+    .top-row-content {
+        flex-direction: column;
         height: auto;
     }
 
     .aqi-container,
-    .time-filter-container {
-        grid-column: span 1; /* Full width on extra small screens */
+    .filters-container {
+        width: 100%;
+    }
+
+    .aqi-display {
+        height: auto;
+    }
+
+    .aqi-row {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 }
 
@@ -974,12 +1049,49 @@ canvas {
                 width: 100%;
                 margin-bottom: 0.5rem;
                 margin-right: 0;
+                border-left: 3px solid var(--accent-color);
+                border-right: 3px solid var(--accent-color);
+                border-top: 3px solid var(--accent-tertiary);
+                border-bottom: 3px solid var(--accent-tertiary);
+                padding: 0.75rem 1.25rem;
+                height: 50px; /* Match desktop height */
+                font-size: 1.1rem; /* Match desktop font size */
+                min-width: 100%; /* Full width on mobile */
+                box-shadow: 0 0 8px rgba(255, 128, 0, 0.4);
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 1rem center;
+                background-size: 18px 18px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: visible;
             }
 
             select, input {
                 width: 100%;
-                min-width: auto;
+                min-width: 100%; /* Full width on mobile */
                 margin-bottom: 0.5rem;
+                border-left: 3px solid var(--accent-color);
+                border-right: 3px solid var(--accent-color);
+                border-top: 3px solid var(--accent-tertiary);
+                border-bottom: 3px solid var(--accent-tertiary);
+                padding: 0.75rem 1.25rem;
+                height: 50px; /* Match desktop height */
+                font-size: 1.1rem; /* Match desktop font size */
+                box-shadow: 0 0 8px rgba(255, 128, 0, 0.4);
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 1rem center;
+                background-size: 18px 18px;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: visible;
             }
 
             button {
