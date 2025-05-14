@@ -1,2 +1,9 @@
 /dist/
 /target/
+*.png
+*.jpg
+*.jpeg
+*.env
+*.json
+*.ico
+/assets/

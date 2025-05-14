@@ -21,6 +21,7 @@ pub struct AirQualityData {
 pub async fn get_air_quality_data() -> Result<Vec<AirQualityData>, String> {
     let client = Client::new();
 
+    //match client.get("https://airqualitymonitoring.cc/airquality").send().await {
     match client.get("http://127.0.0.1:3000/airquality").send().await {
         Ok(response) => match response.json::<Vec<AirQualityData>>().await {
             Ok(data) => Ok(data),
