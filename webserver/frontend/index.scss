@@ -783,7 +783,7 @@ canvas {
     white-space: nowrap;
     margin: 0 0.75rem 0 0; /* Added right margin */
     padding: 0;
-    color: var(--accent-color);
+    color: var(--text-color); /* Changed to white text color */
 }
 
 .aqi-category {
