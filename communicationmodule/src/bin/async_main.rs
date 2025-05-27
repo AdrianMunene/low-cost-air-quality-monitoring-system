@@ -46,8 +46,9 @@ async fn main(spawner: Spawner) {
     let esp_now = esp_wifi::esp_now::EspNow::new(init, peripherals.WIFI).unwrap();
     let (manager, sender, receiver) = esp_now.split(); 
 
-    let peer_address = [0x40,0x4c,0xca,0x4c,0x6f,0x18];
-
+    let peer_address = [0xf0,0xf5,0xbd,0x0c,0x0d,0xc4];
+    //[0x40, 0x4c, 0xca, 0x4c, 0x6f, 0x18];
+    
     manager.add_peer(PeerInfo { peer_address, lmk: None, channel: None, encrypt: false }).unwrap();
 
     let mut sim808 = Sim808::new(peripherals.UART1, peripherals.GPIO20, peripherals.GPIO21, 9600).unwrap();
@@ -73,11 +74,11 @@ async fn send_data_request(
 
     loop {
         match sender.send_async(&peer_address, message.as_bytes()).await {
-            Ok(_) => {},
-            //println!("ESP-NOW data request sent successfully"),
+            Ok(_) => println!("ESP-NOW data request sent successfully"),
             Err(e) => println!("ESP-NOW data request send failed, {:?}", e),
         };
-        Timer::after(Duration::from_secs(5)).await;
+
+        Timer::after(Duration::from_secs(1)).await;
     }
 }
 

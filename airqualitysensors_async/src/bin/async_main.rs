@@ -53,8 +53,8 @@ async fn main(spawner: Spawner) {
     let esp_now = esp_wifi::esp_now::EspNow::new(init, peripherals.WIFI).unwrap(); 
     let (manager, sender, receiver) = esp_now.split();
 
-    let peer_address = [0x40, 0x4c, 0xca, 0x4c, 0x44, 0xd8];
-
+    let peer_address = [0xf0, 0xf5, 0xbd, 0x0b, 0xfe, 0x88];
+    //[0x40, 0x4c, 0xca, 0x4c, 0x44, 0xd8];
     manager.add_peer(PeerInfo { peer_address, lmk: None, channel: None, encrypt: false }).unwrap();
 
     let activate_pin = Output::new(peripherals.GPIO10, esp_hal::gpio::Level::Low);
@@ -110,12 +110,12 @@ async fn send_data(
         let (temperature, pressure, humidity) = bme_data;
 
         let airquality_data = format!(
-            r#"{{ "co2": {}, "pm1_0": {}, "pm2_5": {}, "pm10": {}, "temperature": {:.3}, "pressure": {:.3}, "humidity": {:.3} }}"#, 
-            co2, pm1_0, pm2_5, pm10, temperature, pressure, humidity
+            r#"{{ "temperature": {:.3}, "pressure": {:.3}, "humidity": {:.3}, "pm1_0": {}, "pm2_5": {}, "pm10": {}, "co2": {} }}"#,
+            temperature, pressure, humidity, pm1_0, pm2_5, pm10, co2,
         );
 
         match sender.send_async(&peer_address, airquality_data.as_bytes()).await {
-            Ok(_) => println!("ESP-NOW data sent successfully"),
+            Ok(_) => println!("ESP-NOW data sent successfully: {}", airquality_data),
             Err(e) => println!("ESP-NOW send failed, {:?}", e),
         };
     }
