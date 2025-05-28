@@ -5,7 +5,7 @@ use esp_hal::{
     clock::CpuClock,
     delay::Delay,
     rng::Rng,
-    timer::{systimer::SystemTimer, timg::TimerGroup},
+    timer::{ systimer::SystemTimer, timg::TimerGroup },
 };
 
 use embassy_executor::Spawner;
@@ -38,7 +38,10 @@ pub async fn airquality_main(_spawner: Spawner) {
     ).unwrap();
 
     // Initialize ESP-NOW communication
-    let mut espnow_communication = EspNowCommunicationManager::new(&init, peripherals.WIFI);
+    let mut espnow_communication = EspNowCommunicationManager::new(
+        &init, 
+        peripherals.WIFI
+    );
 
     // Initialize sensors
     let mut sensors = AirQualitySensors::new(
