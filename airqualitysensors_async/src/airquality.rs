@@ -8,14 +8,25 @@ use esp_hal::{
     timer::{ systimer::SystemTimer, timg::TimerGroup },
 };
 
+use esp_wifi::{ EspWifiController, esp_now::EspNowReceiver };
+
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 
 use alloc::format;
 
+use core::mem::MaybeUninit;
+
+static mut INIT: MaybeUninit<EspWifiController<'static>> = MaybeUninit::uninit();
 
 #[embassy_executor::task]
-pub async fn airquality_main(_spawner: Spawner) {
+async fn listener_task(receiver: EspNowReceiver<'static>) {
+    EspNowCommunicationManager::wait_for_request(receiver).await;
+}
+
+
+#[embassy_executor::task]
+pub async fn airquality_main(spawner: Spawner) {
     // Initialize HAL
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let peripherals = esp_hal::init(config);
@@ -31,17 +42,23 @@ pub async fn airquality_main(_spawner: Spawner) {
 
     let timer = TimerGroup::new(peripherals.TIMG0);
 
-    let init = esp_wifi::init(
-        timer.timer0, 
-        Rng::new(peripherals.RNG), 
-        peripherals.RADIO_CLK
-    ).unwrap();
+    let init = unsafe{ 
+        INIT.write(esp_wifi::init(timer.timer0, Rng::new(peripherals.RNG), peripherals.RADIO_CLK,).unwrap()); 
+        
+        INIT.assume_init_mut()
+    };
 
     // Initialize ESP-NOW communication
-    let mut espnow_communication = EspNowCommunicationManager::new(
-        &init, 
+    let espnow_communication = EspNowCommunicationManager::new(
+        init, 
         peripherals.WIFI
     );
+
+    let receiver = espnow_communication.receiver;
+    let mut sender = espnow_communication.sender;
+    let peer_address = espnow_communication.peer_address;
+
+    spawner.spawn(listener_task(receiver)).unwrap();
 
     // Initialize sensors
     let mut sensors = AirQualitySensors::new(
@@ -62,7 +79,7 @@ pub async fn airquality_main(_spawner: Spawner) {
     );
 
     loop {
-        espnow_communication.wait_for_request().await;
+        EspNowCommunicationManager::wait_for_signal().await;
         let (environment_variables, pm, co2, co) = sensors.read_all().await;
 
         let (pm1_0, pm2_5, pm10) = pm;
@@ -73,7 +90,7 @@ pub async fn airquality_main(_spawner: Spawner) {
             temperature, pressure, humidity, pm1_0, pm2_5, pm10, co2, co
         );
 
-        espnow_communication.send_response(&payload).await;
+        EspNowCommunicationManager::send_response(&mut sender, &peer_address, &payload).await;
         Timer::after(Duration::from_secs(2)).await;
     }
 }

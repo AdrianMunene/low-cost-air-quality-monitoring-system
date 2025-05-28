@@ -1,9 +1,12 @@
 use esp_wifi::{EspWifiController, esp_now::{EspNow, EspNowReceiver, EspNowSender, PeerInfo}};
 use esp_hal::peripherals::WIFI; 
-use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
+
 use esp_println::println;
 
-static DATA_REQUEST_SIGNAL: Signal<CriticalSectionRawMutex, ()> = Signal::new();
+use embassy_sync::{channel::Channel, blocking_mutex::raw::CriticalSectionRawMutex};
+//use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
+
+static REQUEST_CHANNEL: Channel<CriticalSectionRawMutex, (), 4> = Channel::new();
 
 pub struct EspNowCommunicationManager<'d> {
     pub sender: EspNowSender<'d>,
@@ -28,21 +31,29 @@ impl<'d> EspNowCommunicationManager<'d> {
         EspNowCommunicationManager { sender, receiver, peer_address }
     }
 
-    pub async fn wait_for_request(&mut self) {
+    pub fn take_receiver(self) -> EspNowReceiver<'d> {
+        self.receiver
+    }    
+
+    pub fn take_sender(self) -> EspNowSender<'d> {
+        self.sender
+    }
+
+    pub async fn wait_for_request(mut receiver: EspNowReceiver<'d>) {
         loop {
-            let data = self.receiver.receive_async().await;
+            let data = receiver.receive_async().await;
             if core::str::from_utf8(data.data()).unwrap_or("") == "REQUEST DATA" {
-                DATA_REQUEST_SIGNAL.signal(());
+                let _ = REQUEST_CHANNEL.send(()).await;
             }
         }
     }
 
-    pub async fn wait_for_signal(&self) {
-        DATA_REQUEST_SIGNAL.wait().await;
+    pub async fn wait_for_signal() {
+        REQUEST_CHANNEL.receive().await;
     }
 
-    pub async fn send_response(&mut self, payload: &str) {
-        match self.sender.send_async(&self.peer_address, payload.as_bytes()).await {
+    pub async fn send_response(sender: &mut EspNowSender<'d>, peer_address: &[u8; 6], payload: &str) {
+        match sender.send_async(peer_address, payload.as_bytes()).await {
             Ok(_) => println!("ESP-NOW data sent: {}", payload),
             Err(e) => println!("ESP-NOW send failed: {:?}", e),
         }

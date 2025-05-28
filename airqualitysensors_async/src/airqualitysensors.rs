@@ -1,12 +1,15 @@
 use crate::sensors::{ mq7::Mq7, bme280::Bme280, mhz19b::Mhz19b, pms5003::Pms5003 };
 use crate::communicationprotocols::pwm::PwmHandler;
-use esp_hal::mcpwm::PeripheralClockConfig;
+
 use esp_hal::{
+    mcpwm::PeripheralClockConfig,
     gpio::{ GpioPin, Output },
     delay::Delay,
     peripherals::{ADC1, I2C0, UART0, UART1, MCPWM0},
 };
 use embassy_time::{Timer, Duration};
+use embassy_futures::join::join;
+
 use libm::powf;
 use fugit::RateExtU32;
 
@@ -37,6 +40,7 @@ impl AirQualitySensors {
     gate_pin: GpioPin<10>,
     mcpwm: MCPWM0,
     pwm_pin: GpioPin<11>,) -> Self {
+
         let peripheral_clock = PeripheralClockConfig::with_frequency(32.MHz()).unwrap();
         let mut delay = Delay::new();
 
@@ -64,6 +68,8 @@ impl AirQualitySensors {
 
     pub async fn read_all(&mut self) -> ((f32, f32, f32), (u16, u16, u16), u16,  u16) {
 
+        let mut delay = Delay::new();
+
         self.activate_pin.set_high();
 
         self.pwm_pin.set_duty_value(99).unwrap();
@@ -72,17 +78,12 @@ impl AirQualitySensors {
         self.pwm_pin.set_duty_value(28).unwrap();
         Timer::after(Duration::from_secs(90)).await;
 
+        let (((pm_data, co2_data), bme_data), mq7_reading) = 
+            join(join(join(self.pms5003.read_pm(), self.mhz19b.read_co2()), async { self.bme280.measure(&mut delay).unwrap() }), async {self.mq7.read().unwrap_or(999)}).await;
 
-        let mq7_reading = self.mq7.read().unwrap_or(999);
         let co = self.calculate_ppm(mq7_reading);
 
-        let pm_data = self.pms5003.read_pm().await.unwrap_or((999, 999, 999));
-        let co2 = self.mhz19b.read_co2().await.unwrap_or(999);
-
-        let mut delay = Delay::new();
-        let measurements = self.bme280.measure(&mut delay).unwrap();
-
-        ((measurements.temperature, measurements.pressure, measurements.humidity), pm_data, co2,  co)
+        ((bme_data.temperature, bme_data.pressure, bme_data.humidity), pm_data.unwrap_or((999, 999, 999)), co2_data.unwrap_or(999),  co)
     }
 
     fn calculate_ppm(&self, reading: u16) -> u16 {

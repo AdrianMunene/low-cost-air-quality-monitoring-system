@@ -7,14 +7,30 @@ use esp_hal::{
     rng::Rng,
     timer::{ systimer::SystemTimer, timg::TimerGroup }
 };
+use esp_wifi::{ EspWifiController, esp_now::EspNowReceiver };
 
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 
 use esp_println::println;
 
+use core::mem::MaybeUninit;
+
+static mut INIT: MaybeUninit<EspWifiController<'static>> = MaybeUninit::uninit();
+
 #[embassy_executor::task]
-pub async fn communication_main(_spawner: Spawner) {
+async fn receiver_task(mut receiver: EspNowReceiver<'static>) {
+    loop {
+        let data = receiver.receive_async().await;
+        match core::str::from_utf8(data.data()) {
+            Ok(text) => println!("Received Air Quality Data: {}", text),
+            Err(_) => println!("Received invalid UTF-8 data"),
+        }
+    }
+}
+
+#[embassy_executor::task]
+pub async fn communication_main(spawner: Spawner) {
     
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let peripherals = esp_hal::init(config);
@@ -30,16 +46,23 @@ pub async fn communication_main(_spawner: Spawner) {
 
     let timer = TimerGroup::new(peripherals.TIMG0);
 
-    let init = esp_wifi::init(
-        timer.timer0, 
-        Rng::new(peripherals.RNG), 
-        peripherals.RADIO_CLK
-    ).unwrap();
+    let init = unsafe{ 
+        INIT.write(esp_wifi::init(timer.timer0, Rng::new(peripherals.RNG), peripherals.RADIO_CLK,).unwrap()); 
+        
+        INIT.assume_init_mut()
+    };
 
-    let mut espnow_communication = EspNowCommunicationManager::new(
-        &init, 
+
+    let espnow_communication = EspNowCommunicationManager::new(
+        init, 
         peripherals.WIFI
     );
+
+    let receiver = espnow_communication.receiver;
+    let mut sender = espnow_communication.sender;
+    let peer_address = espnow_communication.peer_address;
+
+    spawner.spawn(receiver_task(receiver)).unwrap();
 
     let _sim808_functions = Sim808Functions::new(
         peripherals.UART0, 
@@ -51,10 +74,7 @@ pub async fn communication_main(_spawner: Spawner) {
     );
 
     loop {
-        espnow_communication.send_data_request().await;
-
-        espnow_communication.receive_sensor_data().await;
-
+        EspNowCommunicationManager::send_data_request(&mut sender, &peer_address).await;
         Timer::after(Duration::from_secs(1)).await;
     }
 

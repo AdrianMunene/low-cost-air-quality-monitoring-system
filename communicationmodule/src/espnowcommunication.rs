@@ -27,11 +27,11 @@ impl<'d> EspNowCommunicationManager<'d> {
         EspNowCommunicationManager { sender, receiver, peer_address }
     }
 
-    pub async fn send_data_request(&mut self) {
+    pub async fn send_data_request(sender: &mut EspNowSender<'d>, peer_address: &[u8; 6]) {
         let message = "REQUEST DATA";
 
         loop {
-            match self.sender.send_async(&self.peer_address, message.as_bytes()).await {
+            match sender.send_async(peer_address, message.as_bytes()).await {
                 Ok(_) => println!("ESP-NOW data request sent successfully"),
                 Err(e) => println!("ESP-NOW data request send failed, {:?}", e),
             };
