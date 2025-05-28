@@ -2,7 +2,7 @@ use crate::sensors::{ mq7::Mq7, bme280::Bme280, mhz19b::Mhz19b, pms5003::Pms5003
 use crate::communicationprotocols::pwm::PwmHandler;
 use esp_hal::mcpwm::PeripheralClockConfig;
 use esp_hal::{
-    gpio::GpioPin,
+    gpio::{ GpioPin, Output },
     delay::Delay,
     peripherals::{ADC1, I2C0, UART0, UART1, MCPWM0},
 };
@@ -17,6 +17,7 @@ pub struct AirQualitySensors {
     pub mhz19b: Mhz19b<'static>,
     pub pms5003: Pms5003<'static>,
     pub mq7: Mq7<'static, GpioPin<3>>,
+    pub activate_pin: Output<'static>,
     pub pwm_pin: PwmHandler<'static, MCPWM0>
 }
 
@@ -33,10 +34,13 @@ impl AirQualitySensors {
     uart1: UART1,
     rx1: GpioPin<20>,
     tx1: GpioPin<21>,
+    gate_pin: GpioPin<10>,
     mcpwm: MCPWM0,
     pwm_pin: GpioPin<11>,) -> Self {
         let peripheral_clock = PeripheralClockConfig::with_frequency(32.MHz()).unwrap();
         let mut delay = Delay::new();
+
+        let activate_pin = Output::new(gate_pin, esp_hal::gpio::Level::Low);
 
         let mq7 = Mq7::new(adc, adc_pin);
         let pwm_pin = PwmHandler::new(mcpwm, peripheral_clock, pwm_pin);
@@ -53,11 +57,15 @@ impl AirQualitySensors {
             mhz19b,
             pms5003,
             mq7,
+            activate_pin,
             pwm_pin
         }
     }
 
     pub async fn read_all(&mut self) -> ((f32, f32, f32), (u16, u16, u16), u16,  u16) {
+
+        self.activate_pin.set_high();
+
         self.pwm_pin.set_duty_value(99).unwrap();
         Timer::after(Duration::from_secs(60)).await;
 

@@ -56,6 +56,7 @@ pub async fn airquality_main(_spawner: Spawner) {
         peripherals.UART1,
         peripherals.GPIO20,
         peripherals.GPIO21,
+        peripherals.GPIO10,
         peripherals.MCPWM0,
         peripherals.GPIO11,
     );
