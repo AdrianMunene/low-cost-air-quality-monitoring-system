@@ -10,6 +10,8 @@ use embassy_time::{Timer, Duration};
 use libm::powf;
 use fugit::RateExtU32;
 
+// TODO - Activate Pin
+
 pub struct AirQualitySensors {
     pub bme280: Bme280<'static>,
     pub mhz19b: Mhz19b<'static>,

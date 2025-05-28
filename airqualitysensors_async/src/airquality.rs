@@ -31,7 +31,11 @@ pub async fn airquality_main(_spawner: Spawner) {
 
     let timer = TimerGroup::new(peripherals.TIMG0);
 
-    let init = esp_wifi::init(timer.timer0, Rng::new(peripherals.RNG), peripherals.RADIO_CLK).unwrap();
+    let init = esp_wifi::init(
+        timer.timer0, 
+        Rng::new(peripherals.RNG), 
+        peripherals.RADIO_CLK
+    ).unwrap();
 
     // Initialize ESP-NOW communication
     let mut espnow_communication = EspNowCommunicationManager::new(&init, peripherals.WIFI);
