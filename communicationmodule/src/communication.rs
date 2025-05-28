@@ -17,7 +17,6 @@ use esp_println::println;
 pub async fn communication_main(_spawner: Spawner) {
     
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
-
     let peripherals = esp_hal::init(config);
 
     esp_alloc::heap_allocator!(72 * 1024);
