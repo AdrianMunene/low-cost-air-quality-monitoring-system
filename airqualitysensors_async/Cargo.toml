@@ -66,6 +66,10 @@ embassy-futures = "0.1.1"
 esp-hal-embassy  = { version = "0.6.0", features = ["esp32c6"] }
 static_cell      = { version = "2.1.0", features = ["nightly"] }
 bme280 = "0.5.1"
+embedded-hal = "1.0.0"
+fugit = "0.3.7"
+nb = "1.1.0"
+libm = "0.2.15"
 
 [profile.dev]
 # Rust debug is too slow.
