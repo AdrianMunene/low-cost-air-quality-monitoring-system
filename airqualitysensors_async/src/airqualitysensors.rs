@@ -20,6 +20,7 @@ pub struct AirQualitySensors {
     pub mq7: Mq7<'static, GpioPin<3>>,
     pub activate_pin: Output<'static>,
     pub pwm_pin: PwmHandler<'static, MCPWM0>,
+    pub last_co_reading: Option<u16>,
 }
 
 impl AirQualitySensors {
@@ -60,13 +61,22 @@ impl AirQualitySensors {
             mq7,
             activate_pin,
             pwm_pin,
+            last_co_reading: None,
         }
     }
 
-    pub async fn read_all(&mut self) -> ((f32, f32, f32), (u16, u16, u16), u16, u16) {
-        self.activate_pin.set_high();
+    pub async fn read_uart_sensors(&mut self) -> ((u16, u16, u16), u16) {
+        let (pm_data, co2_data) = join(self.pms5003.read_pm(), self.mhz19b.read_co2()).await;
+        (pm_data.unwrap_or((999, 999, 999)), co2_data.unwrap_or(999))   
+    }
 
-        // --- HIGH HEATING PHASE: 60 seconds ---
+    pub async fn read_bme280(&mut self) -> (f32, f32, f32) {
+        let mut delay = Delay::new();
+        let bme_data = self.bme280.measure(&mut delay).unwrap();
+        (bme_data.temperature, bme_data.pressure, bme_data.humidity)
+    }
+
+    pub async fn read_mq7(&mut self) -> u16 {
         self.pwm_pin.set_duty_value(99).unwrap();
 
         let sample_count = 120; // 60s / 0.5s sampling interval
@@ -86,28 +96,29 @@ impl AirQualitySensors {
             (adc_sum / sample_count) as u16
         };
 
-        let co = self.calculate_ppm(avg_reading);
-
-        // --- Read other sensors concurrently ---
-        let ((pm_data, co2_data), bme_data) = 
-            join(
-                join(self.pms5003.read_pm(), self.mhz19b.read_co2()),
-                async { self.bme280.measure(&mut Delay::new()).unwrap() },
-        ).await;
-
-        // --- LOW HEATING PHASE: 90 seconds ---
-        // Switch to low heating after data collection and processing
         self.pwm_pin.set_duty_value(28).unwrap();
         Timer::after(Duration::from_secs(90)).await;
 
-        self.activate_pin.set_low();
+        let co = self.calculate_ppm(avg_reading);
+
+        co
+
+    }
+
+    pub async fn read_all(&mut self) -> ((f32, f32, f32), (u16, u16, u16), u16, Option<u16>) {
+        self.activate_pin.set_high();
+
+        let ((pm1_0, pm2_5, pm10), co2) = self.read_uart_sensors().await;
+
+        let (temperature, pressure, humidity) = self.read_bme280().await;
 
         (
-            (bme_data.temperature, bme_data.pressure, bme_data.humidity),
-            pm_data.unwrap_or((999, 999, 999)),
-            co2_data.unwrap_or(999),
-            co,
+            (temperature, pressure, humidity),
+            (pm1_0, pm2_5, pm10),
+            co2,
+            self.last_co_reading,
         )
+        
     }
 
     fn calculate_ppm(&self, reading: u16) -> u16 {
