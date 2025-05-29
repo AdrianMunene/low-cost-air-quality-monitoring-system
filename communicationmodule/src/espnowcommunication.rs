@@ -1,4 +1,4 @@
-use esp_wifi::{EspWifiController, esp_now::{EspNow, EspNowReceiver, EspNowSender, PeerInfo}};
+use esp_wifi::{esp_now::{EspNow, EspNowReceiver, EspNowSender, PeerInfo }, EspWifiController};
 use esp_hal::peripherals::WIFI; 
 use esp_println::println;
 
@@ -48,6 +48,7 @@ impl<'d> EspNowCommunicationManager<'d> {
                 Ok(received_data) => println!("Received Air Quality Data: {}", received_data),
                 Err(_) => println!("Invalid UTF-8")
             };
+
         }
     }
 }

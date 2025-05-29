@@ -11,7 +11,6 @@ use esp_hal::{
 use esp_wifi::{ EspWifiController, esp_now::EspNowReceiver };
 
 use embassy_executor::Spawner;
-use embassy_time::{Duration, Timer};
 
 use alloc::format;
 

@@ -1,4 +1,7 @@
 #![no_std]
+
+extern crate alloc;
+
 pub mod communicationprotocols;
 pub mod sensors;
 pub mod espnowcommunication;
